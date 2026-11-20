@@ -101,3 +101,5 @@ code { background:var(--rail); padding:1px 6px; border-radius:5px; font-family:"
 .files li { display:flex; flex-direction:column; gap:6px; align-items:flex-start; }
 @media (max-width:720px) { .bar { flex-wrap:wrap; gap:10px; } .bar > .btn { display:none; } .toolbar input:not([type]) { width:100%; } .hero h1 { font-size:28px; } }
 .list code { white-space:nowrap; word-break:normal; }
+.lang { font-size:13.5px; color:var(--ink-2); padding:5px 10px; border:1px solid var(--line); border-radius:8px; }
+.lang:hover { text-decoration:none; background:var(--rail); }

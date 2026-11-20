@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Render the YangmaoSwitch website into ./public.
+"""Render the YangmaoSwitch website into ./public, in Chinese (/) and English (/en/).
 
 Data comes from the catalog repo's `dist` branch:
-* catalog.json – platforms and their free quotas (with official evidence);
+* catalog.json – platforms and their free quotas (with official evidence; English text under `en`);
 * models.json  – every platform's model list (free / covered by the free quota / paid, list prices)
                  and the merged model square.
 
@@ -20,23 +20,181 @@ import urllib.request
 ROOT = pathlib.Path(__file__).resolve().parent
 OUT = ROOT / "public"
 DIST = "https://raw.githubusercontent.com/YangmaoSwitch/catalog/dist"
+SITE = "https://yangmaoswitch.github.io/website/"
 REPO = "https://github.com/YangmaoSwitch"
-
-UNIT = {"requests": "次", "tokens": "tokens", "input_tokens": "输入 tokens", "output_tokens": "输出 tokens", "credits": "额度",
-        "points": "积分", "neurons": "Neurons", "usd": "美元", "cny": "元"}
-PERIOD = {"second": "每秒", "minute": "每分钟", "hour": "每小时", "day": "每天", "week": "每周", "month": "每月", "one-time": "一次性"}
-REQUIRES = {"email": "邮箱", "phone": "手机号", "phone_cn": "大陆手机号", "card": "信用卡", "real_name": "实名", "company": "企业认证",
-            "github": "GitHub 账号", "google": "Google 账号", "cloud_account": "云账号"}
-OVERAGE = {"blocked": "用完即停", "auto_paid": "用完自动转付费", "manual": "需手动开通付费", "unknown": "未知"}
-LEVEL = {"L1": "手动添加 Key", "L2": "粘贴 Key 自动识别", "L3": "一键开通"}
-ACCESS = {"free": ("免费模型", "ok"), "quota": ("用免费额度", "blue"), "paid": ("付费", "")}
-MODAL = {"text": "文本", "image": "图片", "video": "视频", "audio": "音频", "file": "文件"}
+EMAIL = "kangletian@hotmail.com"
 RANK = {"free": 0, "quota": 1, "paid": 2}
 COLORS = ["#c2410c", "#1d4ed8", "#047857", "#6d28d9", "#b91c1c", "#0369a1", "#a16207", "#0f766e", "#be185d", "#4338ca"]
 
 e = html.escape
 
+# ---------------------------------------------------------------- strings
+T = {
+    "zh": {
+        "brand": '羊毛<span>switch</span>', "brand_text": "羊毛switch", "html_lang": "zh-CN", "other": ("en", "English"),
+        "nav": {"models": "模型广场", "providers": "平台", "download": "下载", "join": "平台入驻"}, "get_app": "下载桌面端",
+        "footer": "额度和价格以各平台官方公布为准。羊毛switch 是开源项目（MIT 许可证），与所列平台无隶属关系。",
+        "submit": "提交新平台或纠错", "contact": "联系",
+        "unit": {"requests": "次", "tokens": "Token", "input_tokens": "输入 Token", "output_tokens": "输出 Token", "credits": "额度",
+                 "points": "积分", "neurons": "Neurons", "usd": "美元", "cny": "元"},
+        "period": {"second": "每秒", "minute": "每分钟", "hour": "每小时", "day": "每天", "week": "每周", "month": "每月", "one-time": "一次性"},
+        "requires": {"email": "邮箱", "phone": "手机号", "phone_cn": "大陆手机号", "card": "信用卡", "real_name": "实名", "company": "企业认证",
+                     "github": "GitHub 账号", "google": "Google 账号", "cloud_account": "云账号"},
+        "overage": {"blocked": "用完即停", "auto_paid": "用完自动转付费", "manual": "需手动开通付费", "unknown": "未知"},
+        "level": {"L1": "手动添加密钥", "L2": "粘贴密钥自动识别", "L3": "一键开通"},
+        "access": {"free": "免费模型", "quota": "用免费额度", "paid": "付费"},
+        "group": {"free": "免费模型", "quota": "用免费额度", "paid": "付费"},
+        "modal": {"text": "文本", "image": "图片", "video": "视频", "audio": "音频", "file": "文件"},
+        "tag": {"vision": "视觉", "video": "视频理解", "audio": "音频", "tools": "工具调用", "reasoning": "推理模型", "open": "开源权重"},
+        "tz": {"UTC": "UTC 时间", "Asia/Shanghai": "北京时间", "America/Los_Angeles": "太平洋时间"},
+        "proto": {"openai": "OpenAI 兼容", "anthropic": "Anthropic", "gemini": "Gemini", "other": "其他"},
+        "limit_unknown": "{period}有上限（按{unit}计，数值见平台页面）", "reset": "{tz} {t} 重置", "expires": "{n} 天有效", "sep": " · ", "list": "、",
+        "more_platforms": "{names} 等 {n} 个平台", "no_desc": "暂无介绍。", "region": {"cn": "国内", "global": "海外"},
+        "to_verify": "待核实", "one_click": "一键开通", "signup": "注册：", "overage_l": "超额：",
+        "models_count": "模型 {t} 个（免费 {f} · 用免费额度 {q}）", "go_signup": "去注册", "details": "详情", "verified": "最后核实 {d}",
+        "create_key": "创建密钥", "evidence": "官方依据",
+        "auto_paid_warn": "注意：这个平台的免费额度用完后会自动转为付费。请先在平台控制台开启“用完即停”之类的保护设置。",
+        # model square
+        "sq_title": "羊毛switch - 模型广场：哪些大模型可以免费调用",
+        "sq_desc": "汇总各平台可以免费调用的大模型，列出每个平台的调用方式、免费额度和标价。开源的密钥与用量管理桌面应用。",
+        "sq_h1": "模型广场",
+        "sq_lead": "收录 <b>{m}</b> 个可以免费调用的模型，以及提供它们的 <b>{p}</b> 个平台；其中 {x} 个模型在多个平台都能用。点开模型可以看到每个平台的调用方式、免费额度和标价。",
+        "sq_about": "羊毛switch 是开源的密钥管理和用量管理桌面应用：在本机保存各平台的密钥，按免费额度记账和限量。",
+        "updated": "数据更新于 {d}，尽量保持最新且完整，欢迎用户和平台方<a href=\"{u}\">提交</a>，我们核实后上架。",
+        "search_model": "搜索模型名称", "all": "全部", "cap_vision": "视觉", "cap_tools": "工具调用", "cap_reasoning": "推理",
+        "acc_all": "全部方式", "acc_free": "只看免费模型", "acc_quota": "免费或用免费额度", "all_platforms": "全部平台", "showing": "显示 {n} 个",
+        # model page
+        "m_title": "{name} 在哪些平台可以免费调用 - 羊毛switch", "m_desc": "{name}：{n} 个平台的调用方式、免费额度和标价。",
+        "ctx": "上下文", "input": "输入", "released": "上线时间", "weights": "开源权重", "ctx_tokens": "{n} Token",
+        "platforms_h": "提供这个模型的平台", "th_platform": "平台", "th_model": "模型名", "th_access": "方式", "th_quota": "免费额度",
+        "th_price": "标价（每百万输入 / 输出 Token，美元）",
+        "m_note": "“用免费额度”指调用会消耗平台送的免费额度或代金券。标价为平台公开的美元价格，仅供参考。",
+        "m_cta": "用 <a href=\"{u}\">羊毛switch 桌面端</a> 添加这些平台的密钥后，本机入口会按模型名自动选用有额度的账号。",
+        # generated description
+        "gd_vendor": "{v} 的", "gd_open": "开源", "gd_model": "模型。", "gd_ctx": "上下文 {c}", "gd_input": "可输入{m}", "gd_tools": "支持工具调用",
+        "gd_reason": "支持推理（思考）模式", "gd_avail": "目前可在 {n} 个平台调用，其中 {k} 个可以免费或用免费额度调用。", "gd_join": "，", "gd_end": "。",
+        # providers
+        "p_title": "平台 - 羊毛switch", "p_desc": "各平台大模型免费 API 额度，附官方依据。", "p_h1": "平台",
+        "p_lead": "收录 {n} 个提供免费额度的平台（其中 {a} 个能当 API 用），每条额度都附官方依据。",
+        "p_updated": "目录更新于 {d} · 欢迎<a href=\"{j}\">平台方</a>和用户<a href=\"{u}\">提交</a>，我们核实后上架。",
+        "search_p": "搜索平台、标签", "all_regions": "全部地区", "r_cn": "国内", "r_global": "海外", "ov_any": "超额处理不限", "ov_blocked": "只看用完即停",
+        "api_only": "只看能当 API 用的", "l3_only": "只看能一键开通的",
+        "pp_title": "{name} 免费额度与模型 - 羊毛switch", "quota_h": "免费额度", "models_h": "模型", "basic_h": "基本信息", "terms_h": "条款要点",
+        "no_models": "暂无模型列表，欢迎<a href=\"{u}\">提交</a>。", "models_sum": "共 {t} 个：免费 {f} · 用免费额度 {q} · 付费 {p}。",
+        "k_platform": "平台", "k_region": "地区", "k_api": "能否当 API 用", "k_yes": "能", "k_no": "不能，只能在平台自己的产品里用", "k_endpoint": "接口",
+        "k_protocol": "{p} 协议", "k_requires": "注册要求", "k_blocked": "不支持地区", "k_overage": "额度用完后", "k_level": "开通方式",
+        "k_verified": "最后核实", "k_notes": "说明",
+        "p_cta": "用 <a href=\"{u}\">羊毛switch 桌面端</a> 添加这个平台的密钥后，可以在本机按上面的额度记账和限量。",
+        # download
+        "d_title": "下载 - 羊毛switch", "d_desc": "下载羊毛switch 桌面端（Windows）", "d_h1": "下载羊毛switch 桌面端",
+        "d_lead": "在本机管理各平台的密钥和用量：查看哪些模型可以免费调用、开通账号、按免费额度记账和限量。",
+        "d_release": "最新版本 <b>{t}</b>，发布于 {d}。", "d_win": "下载 Windows 版（{s} MB）",
+        "d_note": "目前只提供 Windows 10/11 x64 版本；macOS 和 Linux 版本之后提供。安装包暂未做代码签名，Windows 可能提示“未知发布者”，可在提示里选择“仍要运行”。",
+        "d_none": "暂无正式版本。可以从源代码构建。", "d_src": "源代码", "d_issues": "反馈问题",
+        "d_sec_h": "安全说明", "d_sec": ["你的密钥只保存在本机系统钥匙串（Windows 凭据管理器）。",
+                                     "羊毛switch 的服务器只提供公开的平台和模型目录，不接触你的密钥，也不转发任何模型调用。",
+                                     "本机入口只监听 127.0.0.1，并且需要本机密钥才能调用；请求用你自己的密钥直接发往平台。",
+                                     "卸载时可以勾选“删除应用数据”，一并删除保存的密钥和用量记录。"],
+        "d_steps_h": "三步上手", "d_steps": ["安装并打开羊毛switch。",
+                                         "在“模型广场”或“平台”里找到平台，一键开通（如 OpenRouter），或去平台注册后粘贴密钥。",
+                                         "打开“接入工具”页，按页面上的地址和本机密钥配置 Cherry Studio、Cline、Claude Code 等工具。OpenAI 兼容工具的接口地址一般是 <code>http://127.0.0.1:17890/v1</code>，模型名直接写平台上的模型名。"],
+        "d_foot": "本地限量按目录里的额度口径估算，默认使用免费额度的 90%。各平台的额度和计费规则以平台官方为准。",
+        # join
+        "j_title": "平台入驻 - 羊毛switch", "j_desc": "提供免费额度的平台接入羊毛switch", "j_h1": "平台入驻",
+        "j_lead": "欢迎提供免费额度的平台主动接入。接入越深，用户开通越方便。",
+        "j_th": ("级别", "平台需要做的", "用户能得到的"),
+        "j_rows": [("L1 收录", "向目录仓库提交拉取请求，新增一条结构化条目（额度、模型、注册链接、官方依据）", "在官网和桌面端可见；注册链接可带平台自己的渠道码"),
+                   ("L2 半自动", "再提供密钥页链接、密钥前缀、查询剩余额度的接口或响应头", "粘贴密钥即自动识别；本机按真实剩余额度限量"),
+                   ("L3 全自动", "再提供 OAuth 2.0 PKCE 公共客户端，允许回调到 127.0.0.1 任意端口，授权后签发密钥", "桌面端一键开通")],
+        "j_models": "也欢迎提供无需密钥即可访问的公开模型列表接口（OpenAI 格式的 <code>/models</code>），并说明每个模型是免费、用免费额度还是付费，方便模型广场保持完整。",
+        "j_no": "不收录返利或邀请链接、API 中转站，以及需要虚拟号码、批量注册或多开账号才能获得的额度。",
+        "j_spec": "查看接入规范", "j_submit": "提交一个平台", "j_mail": "邮件联系",
+        # llms
+        "llms_title": "# 羊毛switch", "llms_intro": "开源的大模型密钥与用量管理桌面应用。本站汇总各平台的免费额度和可以免费调用的模型。",
+        "llms_data": "机器可读数据：catalog.json（平台与额度）、models.json（各平台模型列表：免费 / 用免费额度 / 付费，标价）",
+        "llms_p": "## 平台", "llms_m": "## 免费模型", "llms_api": "（{x}当 API 用）", "llms_can": "能", "llms_cannot": "不能", "llms_reg": "。注册 {u}",
+        "feed_title": "羊毛switch 平台目录",
+    },
+    "en": {
+        "brand": 'Yangmao<span>Switch</span>', "brand_text": "YangmaoSwitch", "html_lang": "en", "other": ("zh", "中文"),
+        "nav": {"models": "Models", "providers": "Providers", "download": "Download", "join": "For platforms"}, "get_app": "Get the app",
+        "footer": "Quotas and prices are as published by each platform. YangmaoSwitch is open source (MIT) and not affiliated with the platforms listed.",
+        "submit": "Submit a platform or a correction", "contact": "Contact",
+        "unit": {"requests": "requests", "tokens": "tokens", "input_tokens": "input tokens", "output_tokens": "output tokens", "credits": "credits",
+                 "points": "points", "neurons": "Neurons", "usd": "USD", "cny": "CNY"},
+        "period": {"second": "per second", "minute": "per minute", "hour": "per hour", "day": "per day", "week": "per week", "month": "per month", "one-time": "one-time"},
+        "requires": {"email": "email", "phone": "phone number", "phone_cn": "Chinese mainland phone number", "card": "credit card", "real_name": "real-name verification",
+                     "company": "company verification", "github": "GitHub account", "google": "Google account", "cloud_account": "cloud account"},
+        "overage": {"blocked": "Stops when used up", "auto_paid": "Switches to paid when used up", "manual": "Paid use must be enabled manually", "unknown": "Unknown"},
+        "level": {"L1": "Add a key manually", "L2": "Paste a key, detected automatically", "L3": "One-click sign-up"},
+        "access": {"free": "Free model", "quota": "Free quota", "paid": "Paid"},
+        "group": {"free": "Free models", "quota": "On free quota", "paid": "Paid"},
+        "modal": {"text": "text", "image": "images", "video": "video", "audio": "audio", "file": "files"},
+        "tag": {"vision": "Vision", "video": "Video", "audio": "Audio", "tools": "Tools", "reasoning": "Reasoning", "open": "Open weights"},
+        "tz": {"UTC": "UTC", "Asia/Shanghai": "Beijing time", "America/Los_Angeles": "Pacific Time"},
+        "proto": {"openai": "OpenAI-compatible", "anthropic": "Anthropic", "gemini": "Gemini", "other": "other"},
+        "limit_unknown": "Limited {period} (in {unit}; see the platform for the number)", "reset": "resets at {t} {tz}", "expires": "valid for {n} days", "sep": " · ", "list": ", ",
+        "more_platforms": "{names} and {k} more", "no_desc": "No description yet.", "region": {"cn": "China", "global": "Global"},
+        "to_verify": "Unverified", "one_click": "One-click", "signup": "Sign-up: ", "overage_l": "When used up: ",
+        "models_count": "{t} models ({f} free · {q} on free quota)", "go_signup": "Sign up", "details": "Details", "verified": "Last verified {d}",
+        "create_key": "Create a key", "evidence": "Source",
+        "auto_paid_warn": "Note: on this platform, usage switches to paid once the free quota is used up. Turn on a stop-when-used-up setting in the platform console first.",
+        "sq_title": "YangmaoSwitch - Models you can call for free",
+        "sq_desc": "Large language models you can call for free, with every platform that serves them: access, free quota and list price. Open-source key and usage manager.",
+        "sq_h1": "Models",
+        "sq_lead": "<b>{m}</b> models you can call for free, served by <b>{p}</b> platforms; {x} of them are available on more than one. Open a model to see each platform's access, free quota and list price.",
+        "sq_about": "YangmaoSwitch is an open-source desktop app for managing your API keys and usage: keys stay on your computer, and calls are metered and capped against each free quota.",
+        "updated": "Data updated {d}. We aim to keep it current and complete; users and platforms are welcome to <a href=\"{u}\">submit</a> entries, which we verify before listing.",
+        "search_model": "Search models", "all": "All", "cap_vision": "Vision", "cap_tools": "Tools", "cap_reasoning": "Reasoning",
+        "acc_all": "Any access", "acc_free": "Free models only", "acc_quota": "Free or free quota", "all_platforms": "All platforms", "showing": "Showing {n}",
+        "m_title": "Where to call {name} for free - YangmaoSwitch", "m_desc": "{name}: access, free quota and list price on {n} platforms.",
+        "ctx": "Context", "input": "Input", "released": "Released", "weights": "Weights", "ctx_tokens": "{n} tokens",
+        "platforms_h": "Platforms serving this model", "th_platform": "Platform", "th_model": "Model ID", "th_access": "Access", "th_quota": "Free quota",
+        "th_price": "List price (USD per 1M input / output tokens)",
+        "m_note": "“Free quota” means calls use the platform's free allowance or vouchers. Prices are the platforms' published USD prices, for reference only.",
+        "m_cta": "Add these platforms' keys to the <a href=\"{u}\">YangmaoSwitch desktop app</a> and its local endpoint picks an account with quota left for each model.",
+        "p_title": "Providers - YangmaoSwitch", "p_desc": "Free API quotas of LLM platforms, each with an official source.", "p_h1": "Providers",
+        "p_lead": "{n} platforms with free quotas ({a} usable as an API), each quota with an official source.",
+        "p_updated": "Catalog updated {d} · <a href=\"{j}\">Platforms</a> and users are welcome to <a href=\"{u}\">submit</a> entries, which we verify before listing.",
+        "search_p": "Search platforms and tags", "all_regions": "All regions", "r_cn": "China", "r_global": "Global", "ov_any": "Any overage policy", "ov_blocked": "Stops when used up",
+        "api_only": "Usable as an API", "l3_only": "One-click sign-up",
+        "pp_title": "{name} free quota and models - YangmaoSwitch", "quota_h": "Free quota", "models_h": "Models", "basic_h": "Details", "terms_h": "Terms to note",
+        "no_models": "No model list yet; feel free to <a href=\"{u}\">submit</a> one.", "models_sum": "{t} models: {f} free · {q} on free quota · {p} paid.",
+        "k_platform": "Platform", "k_region": "Region", "k_api": "Usable as an API", "k_yes": "Yes", "k_no": "No, only inside the platform's own products",
+        "k_endpoint": "Endpoint", "k_protocol": "{p} API", "k_requires": "Sign-up requires", "k_blocked": "Not available in", "k_overage": "When used up",
+        "k_level": "Onboarding", "k_verified": "Last verified", "k_notes": "Notes",
+        "p_cta": "Add this platform's key to the <a href=\"{u}\">YangmaoSwitch desktop app</a> to meter and cap usage against the quota above on your computer.",
+        "d_title": "Download - YangmaoSwitch", "d_desc": "Download the YangmaoSwitch desktop app (Windows)", "d_h1": "Download YangmaoSwitch",
+        "d_lead": "Manage your API keys and usage on your own computer: find models you can call for free, sign up, and meter and cap usage against each free quota.",
+        "d_release": "Latest version <b>{t}</b>, released {d}.", "d_win": "Download for Windows ({s} MB)",
+        "d_note": "Windows 10/11 x64 only for now; macOS and Linux will follow. The installer is not code-signed yet, so Windows may warn about an unknown publisher; choose “Run anyway”.",
+        "d_none": "No release yet. You can build it from source.", "d_src": "Source code", "d_issues": "Report an issue",
+        "d_sec_h": "Security", "d_sec": ["Your keys are stored only in the system keychain on your computer (Windows Credential Manager).",
+                                      "The YangmaoSwitch server only publishes the public platform and model catalog. It never sees your keys or relays model calls.",
+                                      "The local endpoint listens on 127.0.0.1 only and requires a local key; requests go straight to the platforms with your own keys.",
+                                      "When uninstalling, tick “Delete app data” to remove the stored keys and usage records."],
+        "d_steps_h": "Get started", "d_steps": ["Install and open YangmaoSwitch.",
+                                             "Find a platform under Models or Providers. Sign up with one click (e.g. OpenRouter), or sign up on the platform and paste your key.",
+                                             "Open the Connect page and configure Cherry Studio, Cline, Claude Code and other tools with the address and local key shown there. For OpenAI-compatible tools the base URL is usually <code>http://127.0.0.1:17890/v1</code>; use the platform's model ID as the model name."],
+        "d_foot": "Local caps are estimated from the catalog's quota definitions and use 90% of each free quota by default. Each platform's own quotas and billing rules apply.",
+        "j_title": "For platforms - YangmaoSwitch", "j_desc": "List your free quota on YangmaoSwitch", "j_h1": "For platforms",
+        "j_lead": "Platforms that offer free quotas are welcome to integrate. The deeper the integration, the easier it is for users to get started.",
+        "j_th": ("Level", "What the platform provides", "What users get"),
+        "j_rows": [("L1 Listing", "A pull request to the catalog repository with a structured entry (quota, models, sign-up link, official source)", "Listed on the website and in the app; the sign-up link may carry the platform's own channel code"),
+                   ("L2 Assisted", "Also the key page URL, the key prefix, and an endpoint or response headers reporting the remaining quota", "Keys are recognized on paste; usage is capped against the real remaining quota"),
+                   ("L3 Automatic", "Also an OAuth 2.0 PKCE public client that allows redirects to any 127.0.0.1 port and issues a key on authorization", "One-click sign-up in the app")],
+        "j_models": "A public model list endpoint that needs no key (OpenAI-style <code>/models</code>), with whether each model is free, on free quota or paid, helps keep the model list complete.",
+        "j_no": "We do not list referral or invite links, API resellers, or quotas that require virtual phone numbers, bulk sign-ups or multiple accounts.",
+        "j_spec": "Integration guide", "j_submit": "Submit a platform", "j_mail": "Email us",
+        "llms_title": "# YangmaoSwitch", "llms_intro": "Open-source desktop app for managing LLM API keys and usage. This site lists free quotas and the models you can call for free.",
+        "llms_data": "Machine-readable data: catalog.json (platforms and quotas), models.json (each platform's models: free / free quota / paid, list prices)",
+        "llms_p": "## Providers", "llms_m": "## Free models", "llms_api": " ({x} usable as an API)", "llms_can": "", "llms_cannot": "not", "llms_reg": ". Sign up: {u}",
+        "feed_title": "YangmaoSwitch providers",
+    },
+}
 
+
+# ---------------------------------------------------------------- helpers
 def load(src: str) -> dict:
     if src.startswith("http"):
         with urllib.request.urlopen(urllib.request.Request(src, headers={"User-Agent": "YangmaoSwitch-website"}), timeout=60) as r:
@@ -46,7 +204,7 @@ def load(src: str) -> dict:
 
 def latest_release() -> dict | None:
     try:
-        req = urllib.request.Request(f"https://api.github.com/repos/YangmaoSwitch/app/releases/latest", headers={"Accept": "application/vnd.github+json"})
+        req = urllib.request.Request("https://api.github.com/repos/YangmaoSwitch/app/releases/latest", headers={"Accept": "application/vnd.github+json"})
         with urllib.request.urlopen(req, timeout=20) as r:
             return json.loads(r.read().decode("utf-8"))
     except Exception:
@@ -64,30 +222,6 @@ def avatar(name: str, seed: str, cls: str = "av") -> str:
     return f'<span class="{cls}" style="--c:{color}">{e(letters)}</span>'
 
 
-def quota_text(q: dict) -> str:
-    if q.get("amount") is None:
-        parts = [f"{PERIOD.get(q['period'], q['period'])}有上限（按{UNIT.get(q['unit'], q['unit'])}计，数值见平台页面）"]
-    else:
-        amount = f"{q['amount']:,.0f}" if float(q["amount"]).is_integer() else str(q["amount"])
-        parts = [f"{PERIOD.get(q['period'], q['period'])} {amount} {UNIT.get(q['unit'], q['unit'])}"]
-    for k in ("models", "condition"):
-        if q.get(k):
-            parts.append(q[k])
-    if q.get("reset") and q["reset"] != "rolling":
-        parts.append(f"{q['reset']} 重置")
-    if q.get("expires_days"):
-        parts.append(f"{q['expires_days']} 天有效")
-    return " · ".join(parts)
-
-
-def pick_quota(p: dict, access: str) -> dict:
-    """The quota that applies: free models use the model-specific limit, others the general quota or credits."""
-    qs = p["quotas"]
-    if access == "quota":
-        return next((q for q in qs if not q.get("models")), qs[0])
-    return next((q for q in qs if q.get("models")), qs[0])
-
-
 def price_text(p: dict | None) -> str:
     if not p or (p["input"] == 0 and p["output"] == 0):
         return ""
@@ -101,181 +235,346 @@ def ctx_text(n) -> str:
     return f"{n / 1048576:.1f}".rstrip("0").rstrip(".") + "M" if n >= 1e6 else f"{round(n / 1024)}K"
 
 
-def page(title: str, body: str, desc: str = "", depth: int = 0, nav: str = "") -> str:
-    up = "../" * depth
-    links = [("models", "index.html", "模型广场"), ("providers", "providers.html", "Providers"), ("download", "download.html", "下载"),
-             ("join", "providers-join.html", "平台入驻")]
-    navs = "".join(f'<a href="{up}{h}"{" aria-current=page" if k == nav else ""}>{t}</a>' for k, h, t in links)
-    return f"""<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+class Site:
+    def __init__(self, lang: str, cat: dict, sq: dict, providers: list, models: list, slug_of: dict):
+        self.L = lang
+        self.t = T[lang]
+        self.cat, self.sq, self.providers, self.models, self.slug_of = cat, sq, providers, models, slug_of
+        self.provs = {p["id"]: p for p in providers}
+        self.pmodels = sq.get("providers") or {}
+        self.out = OUT if lang == "zh" else OUT / "en"
+
+    # text of catalog entries in this language
+    def pname(self, pid: str) -> str:
+        p = self.provs.get(pid)
+        if not p:
+            return pid
+        return (p.get("name_zh") or p["name"]) if self.L == "zh" else p["name"]
+
+    def ptext(self, p: dict, field: str) -> str:
+        if self.L == "en":
+            en = p.get("en") or {}
+            return {"summary": en.get("summary", ""), "signup_notes": en.get("signup_notes", ""), "free_model_rule": en.get("free_model_rule", "")}[field]
+        return {"summary": p.get("summary", ""), "signup_notes": p["signup"].get("notes", ""), "free_model_rule": (p.get("api") or {}).get("free_model_rule", "")}[field]
+
+    def qfield(self, p: dict, i: int, k: str) -> str:
+        if self.L == "en":
+            qs = (p.get("en") or {}).get("quotas") or []
+            return (qs[i] if i < len(qs) else {}).get(k, "")
+        return p["quotas"][i].get(k, "")
+
+    def terms(self, p: dict) -> list[tuple[str, str]]:
+        ts = p.get("terms", [])
+        if self.L == "en":
+            en = (p.get("en") or {}).get("terms") or []
+            return [(en[i] if i < len(en) else "", t["url"]) for i, t in enumerate(ts) if i < len(en)]
+        return [(t["point"], t["url"]) for t in ts]
+
+    def ptags(self, p: dict) -> list[str]:
+        return (p.get("en") or {}).get("tags", []) if self.L == "en" else p.get("tags", [])
+
+    def quota_text(self, p: dict, i: int) -> str:
+        t, q = self.t, p["quotas"][i]
+        unit, period = t["unit"].get(q["unit"], q["unit"]), t["period"].get(q["period"], q["period"])
+        if q.get("amount") is None:
+            parts = [t["limit_unknown"].format(period=period, unit=unit)]
+        else:
+            amount = f"{q['amount']:,.0f}" if float(q["amount"]).is_integer() else str(q["amount"])
+            parts = [f"{period} {amount} {unit}" if self.L == "zh" else (f"{amount} {unit} {period}" if q["period"] != "one-time" else f"{amount} {unit}, one-time")]
+        for k in ("models", "condition"):
+            v = self.qfield(p, i, k)
+            if v:
+                parts.append(v)
+        if q.get("reset") and q["reset"] != "rolling":
+            hm, _, tz = q["reset"].partition(" ")
+            parts.append(t["reset"].format(t=hm, tz=t["tz"].get(tz, tz)))
+        if q.get("expires_days"):
+            parts.append(t["expires"].format(n=q["expires_days"]))
+        return t["sep"].join(parts)
+
+    def pick_quota(self, p: dict, access: str) -> int:
+        """Index of the quota that applies: free models use the model-specific limit, others the general quota or credits."""
+        qs = p["quotas"]
+        want = (lambda q: not q.get("models")) if access == "quota" else (lambda q: bool(q.get("models")))
+        return next((i for i, q in enumerate(qs) if want(q)), 0)
+
+    def write(self, rel: str, title: str, body: str, desc: str, nav: str = ""):
+        depth = rel.count("/")
+        home = "../" * depth
+        root = home + ("../" if self.L == "en" else "")
+        other_lang, other_label = self.t["other"]
+        other = (home + "en/" if self.L == "zh" else home + "../") + rel
+        alt_zh, alt_en = SITE + rel, SITE + "en/" + rel
+        links = [("models", "index.html"), ("providers", "providers.html"), ("download", "download.html"), ("join", "providers-join.html")]
+        navs = "".join(f'<a href="{home}{h}"{" aria-current=page" if k == nav else ""}>{self.t["nav"][k]}</a>' for k, h in links)
+        doc = f"""<!doctype html>
+<html lang="{self.t['html_lang']}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)}</title><meta name="description" content="{e(desc)}">
-<link rel="stylesheet" href="{up}style.css"><link rel="icon" href="{up}icon.png">
-<link rel="alternate" type="application/feed+json" title="羊毛switch Providers" href="{up}feed.json">
+<link rel="alternate" hreflang="zh-CN" href="{alt_zh}"><link rel="alternate" hreflang="en" href="{alt_en}">
+<link rel="stylesheet" href="{root}style.css"><link rel="icon" href="{root}icon.png">
+<link rel="alternate" type="application/feed+json" href="{home}feed.json">
 </head><body>
-<header><div class="bar"><a class="brand" href="{up}index.html"><img src="{up}icon.png" alt="" width="26" height="26">羊毛<span>switch</span></a>
-<nav>{navs}<a href="{REPO}" class="gh">GitHub</a></nav>
-<a class="btn primary small" href="{up}download.html">下载桌面端</a></div></header>
+<header><div class="bar"><a class="brand" href="{home}index.html"><img src="{root}icon.png" alt="" width="26" height="26">{self.t['brand']}</a>
+<nav>{navs}<a href="{REPO}">GitHub</a></nav>
+<a class="lang" href="{other}" hreflang="{other_lang}" lang="{other_lang}">{other_label}</a>
+<a class="btn primary small" href="{home}download.html">{self.t['get_app']}</a></div></header>
 <main>{body}</main>
-<footer><p>额度和价格以各平台官方公布为准。羊毛switch 是开源项目（MIT），与所列平台无隶属关系。
-<a href="{REPO}/catalog/issues/new/choose">提交新平台或纠错</a> · 联系 <a href="mailto:kangletian@hotmail.com">kangletian@hotmail.com</a></p></footer>
-<script src="{up}app.js"></script></body></html>"""
+<footer><p>{self.t['footer']}
+<a href="{REPO}/catalog/issues/new/choose">{self.t['submit']}</a> · {self.t['contact']} <a href="mailto:{EMAIL}">{EMAIL}</a></p></footer>
+<script src="{root}app.js"></script></body></html>"""
+        path = self.out / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(doc, encoding="utf-8")
 
+    # ---------------------------------------------------------------- models
+    def tags(self, m: dict) -> list[str]:
+        tg, out = self.t["tag"], []
+        mods = m.get("input_modalities") or ["text"]
+        for k in ("image", "video", "audio"):
+            if k in mods:
+                out.append(tg["vision" if k == "image" else k])
+        if m.get("tools"):
+            out.append(tg["tools"])
+        if m.get("reasoning"):
+            out.append(tg["reasoning"])
+        if m.get("open_weights") or m.get("hugging_face_id"):
+            out.append(tg["open"])
+        c = ctx_text(m.get("context_length"))
+        if c:
+            out.append(c)
+        return out
 
-def tags(m: dict) -> list[tuple[str, str]]:
-    t = []
-    mods = m.get("input_modalities") or ["text"]
-    if "image" in mods:
-        t.append(("视觉", ""))
-    if "video" in mods:
-        t.append(("视频理解", ""))
-    if "audio" in mods:
-        t.append(("音频", ""))
-    if m.get("tools"):
-        t.append(("Tools", ""))
-    if m.get("reasoning"):
-        t.append(("推理模型", ""))
-    if m.get("open_weights") or m.get("hugging_face_id"):
-        t.append(("开源权重", ""))
-    c = ctx_text(m.get("context_length"))
-    if c:
-        t.append((c, ""))
-    return t
+    def desc(self, m: dict) -> str:
+        """English: the published description. Chinese: a summary written from the structured data, so pages stay in one language."""
+        if self.L == "en":
+            return m.get("description") or ""
+        t = self.t
+        s = (t["gd_vendor"].format(v=m["vendor"]) if m.get("vendor") else "") + (t["gd_open"] if m.get("open_weights") or m.get("hugging_face_id") else "") + t["gd_model"]
+        bits = []
+        if m.get("context_length"):
+            bits.append(t["gd_ctx"].format(c=ctx_text(m["context_length"])))
+        mods = [x for x in (m.get("input_modalities") or ["text"])]
+        if mods and mods != ["text"]:
+            bits.append(t["gd_input"].format(m=t["list"].join(t["modal"].get(x, x) for x in mods)))
+        if m.get("tools"):
+            bits.append(t["gd_tools"])
+        if m.get("reasoning"):
+            bits.append(t["gd_reason"])
+        if bits:
+            s += t["gd_join"].join(bits) + t["gd_end"]
+        k = sum(o["access"] != "paid" for o in m["offers"])
+        return s + t["gd_avail"].format(n=len(m["offers"]), k=k)
 
-
-def model_card(m: dict, pname) -> str:
-    offers = m["offers"]
-    best = offers[0]["access"]
-    plats = "、".join(pname(o["provider"]) for o in offers[:2]) + (f" 等 {len(offers)} 个平台" if len(offers) > 2 else "")
-    caps = []
-    mods = m.get("input_modalities") or []
-    if "image" in mods:
-        caps.append("vision")
-    if m.get("tools"):
-        caps.append("tools")
-    if m.get("reasoning"):
-        caps.append("reasoning")
-    title = f"{m['vendor']} / {m['name']}" if m.get("vendor") else m["name"]
-    search = " ".join([m["name"], m.get("vendor") or "", m["id"], (m.get("description") or "")[:200]] + [o["model"] for o in offers])
-    badge = ACCESS[best]
-    tag_html = f'<span class="mtag {badge[1]}">{badge[0]}</span>' + "".join(f'<span class="mtag">{e(x)}</span>' for x, _ in tags(m))
-    return f"""<a class="mcard" href="m/{e(m['slug'])}.html" data-search="{e(search.lower())}" data-caps="{' '.join(caps)}" data-providers=" {' '.join(o['provider'] for o in offers)} " data-access="{best}">
+    def model_card(self, m: dict) -> str:
+        t, offers = self.t, m["offers"]
+        best = offers[0]["access"]
+        names = t["list"].join(self.pname(o["provider"]) for o in offers[:2])
+        plats = (t["more_platforms"].format(names=names, n=len(offers), k=len(offers) - 2)) if len(offers) > 2 else t["list"].join(self.pname(o["provider"]) for o in offers)
+        mods = m.get("input_modalities") or []
+        caps = (["vision"] if "image" in mods else []) + (["tools"] if m.get("tools") else []) + (["reasoning"] if m.get("reasoning") else [])
+        title = f"{m['vendor']} / {m['name']}" if m.get("vendor") else m["name"]
+        search = " ".join([m["name"], m.get("vendor") or "", m["id"]] + [o["model"] for o in offers])
+        tone = {"free": "ok", "quota": "blue", "paid": ""}[best]
+        tag_html = f'<span class="mtag {tone}">{t["access"][best]}</span>' + "".join(f'<span class="mtag">{e(x)}</span>' for x in self.tags(m))
+        return f"""<a class="mcard" href="m/{e(m['slug'])}.html" data-search="{e(search.lower())}" data-caps="{' '.join(caps)}" data-providers=" {' '.join(o['provider'] for o in offers)} " data-access="{best}">
 <div class="mcard-head">{avatar(m.get('vendor') or m['name'], m.get('vendor') or offers[0]['provider'])}<div><b>{e(title)}</b><span>{e(plats)}</span></div></div>
-<p class="mdesc">{e(m.get('description') or '暂无介绍。')}</p>
+<p class="mdesc">{e(self.desc(m) or t['no_desc'])}</p>
 <div class="mtags">{tag_html}</div></a>"""
 
-
-def model_page(m: dict, pname, provs: dict) -> str:
-    rows = []
-    for o in m["offers"]:
-        p = provs.get(o["provider"])
-        q = quota_text(pick_quota(p, o["access"])) if p and p.get("quotas") and o["access"] != "paid" else ""
-        lab, tone = ACCESS[o["access"]]
-        rows.append(f"""<tr><td><a class="plat" href="../p/{e(o['provider'])}.html">{avatar(pname(o['provider']), o['provider'], 'av sm')}{e(pname(o['provider']))}</a></td>
-<td><code>{e(o['model'])}</code></td><td><span class="mtag {tone}">{lab}</span></td><td>{e(q) or '—'}</td><td class="num">{e(price_text(o.get('price'))) or '—'}</td></tr>""")
-    facts = []
-    if m.get("context_length"):
-        facts.append(("上下文", f"{m['context_length']:,} tokens"))
-    facts.append(("输入", "、".join(MODAL.get(x, x) for x in (m.get("input_modalities") or ["text"]))))
-    if m.get("created"):
-        facts.append(("上线时间", e(m["created"])))
-    if m.get("hugging_face_id"):
-        facts.append(("开源权重", f'<a href="https://huggingface.co/{e(m["hugging_face_id"])}" target="_blank" rel="noopener">{e(m["hugging_face_id"])}</a>'))
-    title = f"{m['vendor']} / {m['name']}" if m.get("vendor") else m["name"]
-    desc = m.get("description") or ""
-    src = f'<span class="muted">（简介来自 {e(m["description_source"])}）</span>' if m.get("description_source") and desc else ""
-    tag_html = "".join(f'<span class="mtag">{e(x)}</span>' for x, _ in tags(m))
-    body = f"""<p class="crumb"><a href="../index.html">模型广场</a> / {e(m['name'])}</p>
+    def model_page(self, m: dict):
+        t = self.t
+        rows = []
+        for o in m["offers"]:
+            p = self.provs.get(o["provider"])
+            q = self.quota_text(p, self.pick_quota(p, o["access"])) if p and p.get("quotas") and o["access"] != "paid" else ""
+            tone = {"free": "ok", "quota": "blue", "paid": ""}[o["access"]]
+            rows.append(f"""<tr><td><a class="plat" href="../p/{e(o['provider'])}.html">{avatar(self.pname(o['provider']), o['provider'], 'av sm')}{e(self.pname(o['provider']))}</a></td>
+<td><code>{e(o['model'])}</code></td><td><span class="mtag {tone}">{t['access'][o['access']]}</span></td><td>{e(q) or '—'}</td><td class="num">{e(price_text(o.get('price'))) or '—'}</td></tr>""")
+        facts = []
+        if m.get("context_length"):
+            facts.append((t["ctx"], t["ctx_tokens"].format(n=f"{m['context_length']:,}")))
+        facts.append((t["input"], t["list"].join(t["modal"].get(x, x) for x in (m.get("input_modalities") or ["text"]))))
+        if m.get("created"):
+            facts.append((t["released"], e(m["created"])))
+        if m.get("hugging_face_id"):
+            facts.append((t["weights"], f'<a href="https://huggingface.co/{e(m["hugging_face_id"])}" target="_blank" rel="noopener">{e(m["hugging_face_id"])}</a>'))
+        d = self.desc(m)
+        tag_html = "".join(f'<span class="mtag">{e(x)}</span>' for x in self.tags(m))
+        body = f"""<p class="crumb"><a href="../index.html">{t['nav']['models']}</a> / {e(m['name'])}</p>
 <div class="mhead">{avatar(m.get('vendor') or m['name'], m.get('vendor') or m['offers'][0]['provider'], 'av lg')}<div><h1>{e(m['name'])}</h1><p class="muted">{e(m.get('vendor') or '')}</p></div></div>
-{f'<p class="lead">{e(desc)}{src}</p>' if desc else ''}
+{f'<p class="lead">{e(d)}</p>' if d else ''}
 <div class="mtags">{tag_html}</div>
 <table class="kv">{''.join(f'<tr><th>{k}</th><td>{v}</td></tr>' for k, v in facts)}</table>
-<h2>提供这个模型的平台 <span class="muted">{len(m['offers'])}</span></h2>
-<div class="table-wrap"><table class="list"><thead><tr><th>平台</th><th>模型名</th><th>方式</th><th>免费额度</th><th>标价（每百万输入 / 输出 tokens）</th></tr></thead><tbody>{''.join(rows)}</tbody></table></div>
-<p class="muted small">“用免费额度”指调用会消耗平台送的免费额度或代金券。标价为平台公开的美元价格，仅供参考。</p>
-<p class="cta">用 <a href="../download.html">羊毛switch 桌面端</a> 添加这些平台的 Key 后，本机入口会按模型名自动选用有额度的账号。</p>"""
-    return page(f"{m['name']} 在哪些平台可以免费调用 - 羊毛switch", body, f"{title}：{len(m['offers'])} 个平台的调用方式、免费额度和标价。", depth=1, nav="models")
+<h2>{t['platforms_h']} <span class="muted">{len(m['offers'])}</span></h2>
+<div class="table-wrap"><table class="list"><thead><tr><th>{t['th_platform']}</th><th>{t['th_model']}</th><th>{t['th_access']}</th><th>{t['th_quota']}</th><th>{t['th_price']}</th></tr></thead><tbody>{''.join(rows)}</tbody></table></div>
+<p class="muted small">{t['m_note']}</p>
+<p class="cta">{t['m_cta'].format(u='../download.html')}</p>"""
+        self.write(f"m/{m['slug']}.html", t["m_title"].format(name=m["name"]), body, t["m_desc"].format(name=m["name"], n=len(m["offers"])), "models")
 
-
-def provider_card(p: dict, pm: dict | None) -> str:
-    name = p.get("name_zh") or p["name"]
-    tg = [p["region"], "api" if p["api_usable"] else "product", p["onboarding"]["level"], p["overage"]] + p.get("tags", [])
-    badges = [f'<span class="badge {e(p["region"])}">{"国内" if p["region"] == "cn" else "海外"}</span>']
-    if p["status"] != "verified":
-        badges.append('<span class="badge warn">待核实</span>')
-    if p["onboarding"]["level"] == "L3":
-        badges.append('<span class="badge ok">一键开通</span>')
-    quotas = "".join(f'<li><a href="{e(q["evidence"])}" rel="nofollow noopener" target="_blank">{e(quota_text(q))}</a></li>' for q in p["quotas"])
-    req = "、".join(REQUIRES.get(r, r) for r in p["signup"].get("requires", [])) or "—"
-    over_cls = ' class="danger"' if p["overage"] == "auto_paid" else ""
-    mc = f'<span>模型 {pm["total"]} 个（免费 {pm["free"]} · 用免费额度 {pm["quota"]}）</span>' if pm and pm["total"] else ""
-    search = " ".join([p["name"], p.get("name_zh", ""), p.get("summary", ""), " ".join(p.get("tags", []))])
-    return f"""<article class="card" data-tags="{e(' '.join(tg))}" data-search="{e(search.lower())}">
+    # ---------------------------------------------------------------- providers
+    def provider_card(self, p: dict) -> str:
+        t, pm = self.t, self.pmodels.get(p["id"])
+        name = self.pname(p["id"])
+        tg = [p["region"], "api" if p["api_usable"] else "product", p["onboarding"]["level"], p["overage"]]
+        badges = [f'<span class="badge {e(p["region"])}">{t["region"][p["region"]]}</span>']
+        if p["status"] != "verified":
+            badges.append(f'<span class="badge warn">{t["to_verify"]}</span>')
+        if p["onboarding"]["level"] == "L3":
+            badges.append(f'<span class="badge ok">{t["one_click"]}</span>')
+        quotas = "".join(f'<li><a href="{e(q["evidence"])}" rel="nofollow noopener" target="_blank">{e(self.quota_text(p, i))}</a></li>' for i, q in enumerate(p["quotas"]))
+        req = t["list"].join(t["requires"].get(r, r) for r in p["signup"].get("requires", [])) or "—"
+        over_cls = ' class="danger"' if p["overage"] == "auto_paid" else ""
+        mc = f'<span>{t["models_count"].format(t=pm["total"], f=pm["free"], q=pm["quota"])}</span>' if pm and pm["total"] else ""
+        summary = self.ptext(p, "summary")
+        search = " ".join([p["name"], p.get("name_zh", ""), summary, " ".join(self.ptags(p))])
+        return f"""<article class="card" data-tags="{e(' '.join(tg))}" data-search="{e(search.lower())}">
 <div class="card-head">{avatar(name, p['id'])}<h3><a href="p/{e(p['id'])}.html">{e(name)}</a></h3>{''.join(badges)}</div>
-{f'<p>{e(p["summary"])}</p>' if p.get("summary") else ''}
+{f'<p>{e(summary)}</p>' if summary else ''}
 <ul class="quotas">{quotas}</ul>
-<p class="meta"><span>注册：{e(req)}</span><span{over_cls}>超额：{OVERAGE[p['overage']]}</span>{mc}</p>
-<p class="actions"><a class="btn" href="{e(p['signup']['url'])}" rel="nofollow noopener" target="_blank">去注册</a>
-<a class="btn" href="p/{e(p['id'])}.html">详情</a></p>
-<p class="foot">最后核实 {e(p['last_verified'])}</p></article>"""
+<p class="meta"><span>{t['signup']}{e(req)}</span><span{over_cls}>{t['overage_l']}{t['overage'][p['overage']]}</span>{mc}</p>
+<p class="actions"><a class="btn" href="{e(p['signup']['url'])}" rel="nofollow noopener" target="_blank">{t['go_signup']}</a>
+<a class="btn" href="p/{e(p['id'])}.html">{t['details']}</a></p>
+<p class="foot">{t['verified'].format(d=e(p['last_verified']))}</p></article>"""
 
+    def provider_page(self, p: dict):
+        t, pm = self.t, self.pmodels.get(p["id"])
+        name = self.pname(p["id"])
+        api = p.get("api") or {}
+        rows = [
+            (t["k_platform"], f'<a href="{e(p["homepage"])}" target="_blank" rel="noopener">{e(name)}</a>'),
+            (t["k_region"], t["region"][p["region"]]),
+            (t["k_api"], t["k_yes"] if p["api_usable"] else t["k_no"]),
+            (t["k_endpoint"], f'<code>{e(api["base_url"])}</code>（{e(t["k_protocol"].format(p=t["list"].join(t["proto"].get(x, x) for x in api["protocol"])))}）' if api and self.L == "zh" else
+             (f'<code>{e(api["base_url"])}</code> ({e(t["k_protocol"].format(p=t["list"].join(t["proto"].get(x, x) for x in api["protocol"])))})' if api else "—")),
+            (t["k_requires"], e(t["list"].join(t["requires"].get(r, r) for r in p["signup"].get("requires", [])) or "—")),
+            (t["k_blocked"], e(t["list"].join(p["signup"].get("regions_blocked", []))) or "—"),
+            (t["k_overage"], t["overage"][p["overage"]]),
+            (t["k_level"], t["level"][p["onboarding"]["level"]]),
+            (t["k_verified"], e(p["last_verified"])),
+        ]
+        notes = self.ptext(p, "signup_notes")
+        if notes:
+            rows.append((t["k_notes"], e(notes)))
+        open_p, close_p = ("（", "）") if self.L == "zh" else (" (", ")")
+        quotas = "".join(
+            f'<li>{e(self.quota_text(p, i))}{open_p + e(self.qfield(p, i, "note")) + close_p if self.qfield(p, i, "note") else ""} — <a href="{e(q["evidence"])}" target="_blank" rel="nofollow noopener">{t["evidence"]}</a></li>'
+            for i, q in enumerate(p["quotas"]))
+        terms = "".join(f'<li><a href="{e(u)}" target="_blank" rel="nofollow noopener">{e(x)}</a></li>' for x, u in self.terms(p))
+        links = [f'<a class="btn primary" href="{e(p["signup"]["url"])}" target="_blank" rel="nofollow noopener">{t["go_signup"]}</a>']
+        if p["onboarding"].get("key_page"):
+            links.append(f'<a class="btn" href="{e(p["onboarding"]["key_page"])}" target="_blank" rel="nofollow noopener">{t["create_key"]}</a>')
+        warn = f'<p class="alert">{t["auto_paid_warn"]}</p>' if p["overage"] == "auto_paid" else ""
+        models = f'<p class="muted">{t["no_models"].format(u=REPO + "/catalog/issues/new/choose")}</p>'
+        if pm and pm["total"]:
+            groups = []
+            for acc in ("free", "quota", "paid"):
+                lst = [x for x in pm["models"] if x["access"] == acc]
+                if not lst:
+                    continue
 
-def provider_page(p: dict, pm: dict | None, slug_of: dict) -> str:
-    name = p.get("name_zh") or p["name"]
-    api = p.get("api") or {}
-    rows = [
-        ("平台", f'<a href="{e(p["homepage"])}" target="_blank" rel="noopener">{e(p["name"])}</a>'),
-        ("地区", "国内" if p["region"] == "cn" else "海外"),
-        ("能否当 API 用", "能" if p["api_usable"] else "不能，只能在平台自己的产品里用"),
-        ("接口", f'<code>{e(api["base_url"])}</code>（{e("、".join(api["protocol"]))} 协议）' if api else "—"),
-        ("注册要求", e("、".join(REQUIRES.get(r, r) for r in p["signup"].get("requires", [])) or "—")),
-        ("不支持地区", e("、".join(p["signup"].get("regions_blocked", []))) or "—"),
-        ("额度用完后", OVERAGE[p["overage"]]),
-        ("开通方式", LEVEL[p["onboarding"]["level"]]),
-        ("最后核实", e(p["last_verified"])),
-    ]
-    if p["signup"].get("notes"):
-        rows.append(("说明", e(p["signup"]["notes"])))
-    quotas = "".join(f'<li>{e(quota_text(q))}{f"（{e(q["note"])}）" if q.get("note") else ""} — <a href="{e(q["evidence"])}" target="_blank" rel="nofollow noopener">官方依据</a></li>' for q in p["quotas"])
-    terms = "".join(f'<li><a href="{e(t["url"])}" target="_blank" rel="nofollow noopener">{e(t["point"])}</a></li>' for t in p.get("terms", []))
-    links = [f'<a class="btn primary" href="{e(p["signup"]["url"])}" target="_blank" rel="nofollow noopener">去注册</a>']
-    if p["onboarding"].get("key_page"):
-        links.append(f'<a class="btn" href="{e(p["onboarding"]["key_page"])}" target="_blank" rel="nofollow noopener">创建 Key</a>')
-    warn = '<p class="alert">注意：这个平台的免费额度用完后会自动转为付费。请先在平台控制台开启“用完即停”之类的保护设置。</p>' if p["overage"] == "auto_paid" else ""
-
-    models = '<p class="muted">暂无模型列表，欢迎<a href="' + REPO + '/catalog/issues/new/choose">提交</a>。</p>'
-    if pm and pm["total"]:
-        groups = []
-        for acc in ("free", "quota", "paid"):
-            lst = [x for x in pm["models"] if x["access"] == acc]
-            if not lst:
-                continue
-            def cell(x):
-                code = f'<code>{e(x["model"])}</code>'
-                return f'<a href="../m/{e(slug_of[x["model"]])}.html">{code}</a>' if x["model"] in slug_of else code
-            li = "".join(f'<tr><td>{cell(x)}</td><td class="num">{e(price_text(x.get("price"))) or "—"}</td></tr>' for x in lst)
-            lab = ACCESS[acc][0]
-            groups.append(f'<details{" open" if acc != "paid" else ""}><summary>{lab} <span class="muted">{len(lst)}</span></summary>'
-                          f'<table class="list"><thead><tr><th>模型名</th><th>标价（每百万输入 / 输出 tokens）</th></tr></thead><tbody>{li}</tbody></table></details>')
-        models = f'<p class="muted">共 {pm["total"]} 个：免费 {pm["free"]} · 用免费额度 {pm["quota"]} · 付费 {pm["paid"]}。</p>' + "".join(groups)
-    body = f"""<p class="crumb"><a href="../providers.html">Providers</a> / {e(name)}</p>
-<div class="mhead">{avatar(name, p['id'], 'av lg')}<div><h1>{e(name)}</h1><p class="muted">{e(p['name'])}</p></div></div>
-{f'<p class="lead">{e(p["summary"])}</p>' if p.get("summary") else ''}{warn}
-<h2>免费额度</h2><ul>{quotas}</ul>
-<h2>模型</h2>{models}
-<h2>基本信息</h2><table class="kv">{''.join(f'<tr><th>{k}</th><td>{v}</td></tr>' for k, v in rows)}</table>
-{f'<h2>条款要点</h2><ul>{terms}</ul>' if terms else ''}
+                def cell(x):
+                    code = f'<code>{e(x["model"])}</code>'
+                    return f'<a href="../m/{e(self.slug_of[x["model"]])}.html">{code}</a>' if x["model"] in self.slug_of else code
+                li = "".join(f'<tr><td>{cell(x)}</td><td class="num">{e(price_text(x.get("price"))) or "—"}</td></tr>' for x in lst)
+                groups.append(f'<details{" open" if acc != "paid" else ""}><summary>{t["group"][acc]} <span class="muted">{len(lst)}</span></summary>'
+                              f'<table class="list"><thead><tr><th>{t["th_model"]}</th><th>{t["th_price"]}</th></tr></thead><tbody>{li}</tbody></table></details>')
+            models = f'<p class="muted">{t["models_sum"].format(t=pm["total"], f=pm["free"], q=pm["quota"], p=pm["paid"])}</p>' + "".join(groups)
+        summary = self.ptext(p, "summary")
+        sub = p["name"] if self.L == "zh" and p.get("name_zh") else ""
+        body = f"""<p class="crumb"><a href="../providers.html">{t['nav']['providers']}</a> / {e(name)}</p>
+<div class="mhead">{avatar(name, p['id'], 'av lg')}<div><h1>{e(name)}</h1>{f'<p class="muted">{e(sub)}</p>' if sub else ''}</div></div>
+{f'<p class="lead">{e(summary)}</p>' if summary else ''}{warn}
+<h2>{t['quota_h']}</h2><ul>{quotas}</ul>
+<h2>{t['models_h']}</h2>{models}
+<h2>{t['basic_h']}</h2><table class="kv">{''.join(f'<tr><th>{k}</th><td>{v}</td></tr>' for k, v in rows)}</table>
+{f'<h2>{t["terms_h"]}</h2><ul>{terms}</ul>' if terms else ''}
 <p class="actions">{' '.join(links)}</p>
-<p class="cta">用 <a href="../download.html">羊毛switch 桌面端</a> 添加这个平台的 Key 后，可以在本机按上面的额度记账和限量。</p>"""
-    return page(f"{name} 免费额度与模型 - 羊毛switch", body, p.get("summary", ""), depth=1, nav="providers")
+<p class="cta">{t['p_cta'].format(u='../download.html')}</p>"""
+        self.write(f"p/{p['id']}.html", t["pp_title"].format(name=name), body, summary, "providers")
+
+    # ---------------------------------------------------------------- pages
+    def build(self, dl_items: list[dict], release: dict | None):
+        t, models, providers = self.t, self.models, self.providers
+        issues = f"{REPO}/catalog/issues/new/choose"
+
+        used = sorted({o["provider"] for m in models for o in m["offers"]}, key=lambda x: self.pname(x).lower())
+        multi = sum(len(m["offers"]) > 1 for m in models)
+        hero = f"""<section class="hero"><h1>{t['sq_h1']}</h1>
+<p class="lead">{t['sq_lead'].format(m=len(models), p=len(used), x=multi)}</p>
+<p class="muted">{t['sq_about']} {t['updated'].format(d=e((self.sq.get('generated_at') or '')[:10]), u=issues)}</p></section>"""
+        filters = f"""<div class="toolbar">
+<input id="mq" placeholder="{t['search_model']}">
+<div class="seg" id="mcap"><button data-v="" aria-pressed="true">{t['all']}</button><button data-v="vision">{t['cap_vision']}</button><button data-v="tools">{t['cap_tools']}</button><button data-v="reasoning">{t['cap_reasoning']}</button></div>
+<select id="macc"><option value="">{t['acc_all']}</option><option value="free">{t['acc_free']}</option><option value="quota">{t['acc_quota']}</option></select>
+<select id="mprov"><option value="">{t['all_platforms']}</option>{''.join(f'<option value="{e(x)}">{e(self.pname(x))}</option>' for x in used)}</select>
+<span id="mcount" class="muted" data-tpl="{e(t['showing'])}"></span></div>"""
+        grid = '<section class="mgrid" id="mgrid">' + "".join(self.model_card(m) for m in models) + "</section>"
+        self.write("index.html", t["sq_title"], hero + filters + grid, t["sq_desc"], "models")
+        for m in models:
+            self.model_page(m)
+
+        api_n = sum(1 for p in providers if p["api_usable"])
+        phero = f"""<section class="hero"><h1>{t['p_h1']}</h1>
+<p class="lead">{t['p_lead'].format(n=len(providers), a=api_n)}</p>
+<p class="muted">{t['p_updated'].format(d=e((self.cat.get('generated_at') or '')[:10]), j='providers-join.html', u=issues)}</p></section>"""
+        pfilters = f"""<div class="toolbar">
+<input id="q" placeholder="{t['search_p']}">
+<select id="region"><option value="">{t['all_regions']}</option><option value="cn">{t['r_cn']}</option><option value="global">{t['r_global']}</option></select>
+<select id="overage"><option value="">{t['ov_any']}</option><option value="blocked">{t['ov_blocked']}</option></select>
+<label><input type="checkbox" id="api" checked> {t['api_only']}</label>
+<label><input type="checkbox" id="l3"> {t['l3_only']}</label>
+<span id="count" class="muted" data-tpl="{e(t['showing'])}"></span></div>"""
+        pgrid = '<section class="grid" id="grid">' + "".join(self.provider_card(p) for p in providers) + "</section>"
+        self.write("providers.html", t["p_title"], phero + pfilters + pgrid, t["p_desc"], "providers")
+        for p in providers:
+            self.provider_page(p)
+
+        root = "" if self.L == "zh" else "../"
+        if release and release.get("assets"):
+            assets = "".join(f'<li><a href="{e(a["browser_download_url"])}">{e(a["name"])}</a> ({a["size"] / 1048576:.1f} MB)</li>'
+                             for a in release["assets"] if not a["name"].endswith((".sig", ".json")))
+            dl = f'<p>{t["d_release"].format(t=e(release["tag_name"]), d=e(release["published_at"][:10]))}</p><ul class="files">{assets}</ul>'
+        elif dl_items:
+            dl = '<ul class="files">' + "".join(
+                f'<li><a class="btn primary" href="{root}download/{e(f["name"])}">{t["d_win"].format(s=f"{f["size"] / 1048576:.1f}")}</a>'
+                f'<span class="muted small">{e(f["name"])} · SHA-256 <code>{f["sha"]}</code></span></li>' for f in dl_items) + f'</ul><p class="muted small">{t["d_note"]}</p>'
+        else:
+            dl = f'<p class="muted">{t["d_none"]}</p>'
+        download = f"""<h1>{t['d_h1']}</h1><p class="lead">{t['d_lead']}</p>{dl}
+<p class="actions"><a class="btn" href="{REPO}/app">{t['d_src']}</a> <a class="btn" href="{REPO}/app/issues">{t['d_issues']}</a></p>
+<h2>{t['d_sec_h']}</h2><ul>{''.join(f'<li>{x}</li>' for x in t['d_sec'])}</ul>
+<h2>{t['d_steps_h']}</h2><ol>{''.join(f'<li>{x}</li>' for x in t['d_steps'])}</ol>
+<p class="muted">{t['d_foot']}</p>"""
+        self.write("download.html", t["d_title"], download, t["d_desc"], "download")
+
+        th = "".join(f"<th>{x}</th>" for x in t["j_th"])
+        jr = "".join(f"<tr><td>{a}</td><td>{b}</td><td>{c}</td></tr>" for a, b, c in t["j_rows"])
+        join = f"""<h1>{t['j_h1']}</h1><p class="lead">{t['j_lead']}</p>
+<table class="kv"><tr>{th}</tr>{jr}</table>
+<p>{t['j_models']}</p><p>{t['j_no']}</p>
+<p class="actions"><a class="btn primary" href="{REPO}/catalog/blob/main/CONTRIBUTING.md">{t['j_spec']}</a> <a class="btn" href="{issues}">{t['j_submit']}</a> <a class="btn" href="mailto:{EMAIL}">{t['j_mail']}</a></p>"""
+        self.write("providers-join.html", t["j_title"], join, t["j_desc"], "join")
+
+        base = SITE if self.L == "zh" else SITE + "en/"
+        feed = {"version": "https://jsonfeed.org/version/1.1", "title": t["feed_title"], "home_page_url": base,
+                "items": [{"id": p["id"], "title": self.pname(p["id"]), "content_text": "; ".join(self.quota_text(p, i) for i in range(len(p["quotas"]))),
+                           "url": f"{base}p/{p['id']}.html", "date_modified": p["last_verified"]} for p in providers]}
+        (self.out / "feed.json").write_text(json.dumps(feed, ensure_ascii=False, indent=1), encoding="utf-8")
+        llms = [t["llms_title"], "", t["llms_intro"], t["llms_data"], "", t["llms_p"], ""]
+        for p in providers:
+            api_txt = t["llms_api"].format(x=t["llms_can"] if p["api_usable"] else t["llms_cannot"]).replace("  ", " ")
+            llms.append(f"- {self.pname(p['id'])}{api_txt}: " + "; ".join(self.quota_text(p, i) for i in range(len(p["quotas"]))) + t["llms_reg"].format(u=p["signup"]["url"]))
+        llms += ["", t["llms_m"], ""]
+        for m in models:
+            ok = [o for o in m["offers"] if o["access"] != "paid"]
+            llms.append(f"- {m['name']}: " + t["list"].join(f"{self.pname(o['provider'])} ({t['access'][o['access']]}, {o['model']})" for o in ok))
+        (self.out / "llms.txt").write_text("\n".join(llms) + "\n", encoding="utf-8")
 
 
 def main() -> None:
     cat = load(sys.argv[1] if len(sys.argv) > 1 else f"{DIST}/catalog.json")
     sq = load(sys.argv[2] if len(sys.argv) > 2 else f"{DIST}/models.json")
     providers = sorted(cat["providers"], key=lambda p: (p["status"] != "verified", p["onboarding"]["level"] != "L3", p["name"].lower()))
-    provs = {p["id"]: p for p in providers}
-    pname = lambda pid: (provs[pid].get("name_zh") or provs[pid]["name"]) if pid in provs else pid
-    pmodels = sq.get("providers") or {}
     models = sq["models"]
     seen: set[str] = set()
     slug_of: dict[str, str] = {}
@@ -290,108 +589,21 @@ def main() -> None:
 
     if OUT.exists():
         shutil.rmtree(OUT)
-    for d in ("p", "m", "download"):
-        (OUT / d).mkdir(parents=True)
+    (OUT / "download").mkdir(parents=True)
     for f in ("style.css", "app.js", "icon.png"):
         shutil.copy(ROOT / "static" / f, OUT / f)
-
-    # model square (home)
-    used = sorted({o["provider"] for m in models for o in m["offers"]}, key=lambda x: pname(x))
-    multi = sum(len(m["offers"]) > 1 for m in models)
-    hero = f"""<section class="hero"><h1>模型广场</h1>
-<p class="lead">收录 <b>{len(models)}</b> 个可以免费调用的模型，以及提供它们的 <b>{len(used)}</b> 个平台；其中 {multi} 个模型在多个平台都能用。点开模型可以看到每个平台的调用方式、免费额度和标价。</p>
-<p class="muted">羊毛switch 是开源的 Key 管理和用量管理桌面应用：在本机保存各平台的 Key，按免费额度记账和限量。
-数据更新于 {e((sq.get('generated_at') or '')[:10])}，尽量保持最新且完整，欢迎用户和平台方<a href="{REPO}/catalog/issues/new/choose">提交</a>，我们核实后上架。</p></section>"""
-    filters = f"""<div class="toolbar" id="mfilters">
-<input id="mq" placeholder="搜索模型名称">
-<div class="seg" id="mcap"><button data-v="" aria-pressed="true">全部</button><button data-v="vision">视觉</button><button data-v="tools">Tools</button><button data-v="reasoning">推理</button></div>
-<select id="macc"><option value="">全部方式</option><option value="free">只看免费模型</option><option value="quota">免费或用免费额度</option></select>
-<select id="mprov"><option value="">全部平台</option>{''.join(f'<option value="{e(x)}">{e(pname(x))}</option>' for x in used)}</select>
-<span id="mcount" class="muted"></span></div>"""
-    grid = '<section class="mgrid" id="mgrid">' + "".join(model_card(m, pname) for m in models) + "</section>"
-    (OUT / "index.html").write_text(page("羊毛switch - 模型广场：哪些大模型可以免费调用", hero + filters + grid,
-                                         "汇总各平台可以免费调用的大模型，列出每个平台的调用方式、免费额度和标价。开源的 Key 与用量管理桌面应用。", nav="models"), encoding="utf-8")
-    for m in models:
-        (OUT / "m" / f"{m['slug']}.html").write_text(model_page(m, pname, provs), encoding="utf-8")
-
-    # providers
-    api_n = sum(1 for p in providers if p["api_usable"])
-    phero = f"""<section class="hero"><h1>Providers</h1>
-<p class="lead">收录 {len(providers)} 个提供免费额度的平台（其中 {api_n} 个能当 API 用），每条额度都附官方依据。</p>
-<p class="muted">目录更新于 {e((cat.get('generated_at') or '')[:10])} · 欢迎<a href="providers-join.html">平台方</a>和用户<a href="{REPO}/catalog/issues/new/choose">提交</a>，我们核实后上架。</p></section>"""
-    pfilters = """<div class="toolbar">
-<input id="q" placeholder="搜索平台、标签">
-<select id="region"><option value="">全部地区</option><option value="cn">国内</option><option value="global">海外</option></select>
-<select id="overage"><option value="">超额处理不限</option><option value="blocked">只看用完即停</option></select>
-<label><input type="checkbox" id="api" checked> 只看能当 API 用的</label>
-<label><input type="checkbox" id="l3"> 只看能一键开通的</label>
-<span id="count" class="muted"></span></div>"""
-    pgrid = '<section class="grid" id="grid">' + "".join(provider_card(p, pmodels.get(p["id"])) for p in providers) + "</section>"
-    (OUT / "providers.html").write_text(page("Providers - 羊毛switch", phero + pfilters + pgrid, "各平台大模型免费 API 额度，附官方依据。", nav="providers"), encoding="utf-8")
-    for p in providers:
-        (OUT / "p" / f"{p['id']}.html").write_text(provider_page(p, pmodels.get(p["id"]), slug_of), encoding="utf-8")
-
-    # download
+    dl_items = []
+    for f in sorted((ROOT / "static" / "download").glob("*.exe")) if (ROOT / "static" / "download").exists() else []:
+        shutil.copy(f, OUT / "download" / f.name)
+        dl_items.append({"name": f.name, "size": f.stat().st_size, "sha": hashlib.sha256(f.read_bytes()).hexdigest()})
     release = latest_release()
-    files = sorted((ROOT / "static" / "download").glob("*.exe")) if (ROOT / "static" / "download").exists() else []
-    if release and release.get("assets"):
-        assets = "".join(f'<li><a href="{e(a["browser_download_url"])}">{e(a["name"])}</a>（{a["size"] / 1048576:.1f} MB）</li>'
-                         for a in release["assets"] if not a["name"].endswith((".sig", ".json")))
-        dl = f'<p>最新版本 <b>{e(release["tag_name"])}</b>，发布于 {e(release["published_at"][:10])}。</p><ul class="files">{assets}</ul>'
-    elif files:
-        items = []
-        for f in files:
-            shutil.copy(f, OUT / "download" / f.name)
-            sha = hashlib.sha256(f.read_bytes()).hexdigest()
-            items.append(f'<li><a class="btn primary" href="download/{e(f.name)}">下载 Windows 版（{f.stat().st_size / 1048576:.1f} MB）</a>'
-                         f'<span class="muted small">{e(f.name)} · SHA-256 <code>{sha}</code></span></li>')
-        dl = f'<ul class="files">{"".join(items)}</ul><p class="muted small">目前只提供 Windows 10/11 x64 版本；macOS 和 Linux 版本之后提供。安装包暂未做代码签名，Windows 可能提示“未知发布者”，可在提示里选择“仍要运行”。</p>'
-    else:
-        dl = '<p class="muted">暂无正式版本。可以从源代码构建。</p>'
-    download = f"""<h1>下载羊毛switch 桌面端</h1>
-<p class="lead">在本机管理各平台的 Key 和用量：查看哪些模型可以免费调用、开通账号、按免费额度记账和限量。</p>
-{dl}
-<p class="actions"><a class="btn" href="{REPO}/app">源代码</a> <a class="btn" href="{REPO}/app/issues">反馈问题</a></p>
-<h2>安全说明</h2><ul>
-<li>你的 Key 只保存在本机系统钥匙串（Windows 凭据管理器）。</li>
-<li>羊毛switch 的服务器只提供公开的平台和模型目录，不接触你的 Key，也不转发任何模型调用。</li>
-<li>本机入口只监听 127.0.0.1，并且需要本机密钥才能调用；请求用你自己的 Key 直接发往平台。</li>
-<li>卸载时可以勾选“删除应用数据”，一并删除保存的 Key 和用量记录。</li></ul>
-<h2>三步上手</h2><ol>
-<li>安装并打开羊毛switch。</li>
-<li>在“模型广场”或“Providers”里找到平台，一键开通（如 OpenRouter），或去平台注册后粘贴 Key。</li>
-<li>打开“接入工具”页，按页面上的地址和本机密钥配置 Cherry Studio、Cline、Claude Code 等工具。OpenAI 兼容工具的 Base URL 一般是 <code>http://127.0.0.1:17890/v1</code>，模型名直接写平台上的模型名。</li></ol>
-<p class="muted">本地限量按目录里的额度口径估算，默认使用免费额度的 90%。各平台的额度和计费规则以平台官方为准。</p>"""
-    (OUT / "download.html").write_text(page("下载 - 羊毛switch", download, "下载羊毛switch 桌面端（Windows）", nav="download"), encoding="utf-8")
 
-    join = f"""<h1>平台入驻</h1>
-<p class="lead">欢迎提供免费额度的平台主动接入。接入越深，用户开通越方便。</p>
-<table class="kv"><tr><th>级别</th><th>平台需要做的</th><th>用户能得到的</th></tr>
-<tr><td>L1 收录</td><td>向目录仓库提 PR，新增一条结构化条目（额度、模型、注册链接、官方依据）</td><td>在官网和桌面端可见；注册链接可带平台自己的渠道码</td></tr>
-<tr><td>L2 半自动</td><td>再提供 Key 页链接、Key 前缀、查询剩余额度的接口或响应头</td><td>粘贴 Key 即自动识别；本机按真实剩余额度限量</td></tr>
-<tr><td>L3 全自动</td><td>再提供 OAuth 2.0 PKCE 公共客户端，允许回调到 127.0.0.1 任意端口，授权后签发 Key</td><td>桌面端一键开通</td></tr></table>
-<p>也欢迎提供公开的模型列表接口（无需 Key 的 OpenAI 格式 <code>/models</code>），以及每个模型是免费、用免费额度还是付费，方便模型广场保持完整。</p>
-<p>不收录返利或邀请链接、API 中转站，以及需要虚拟号码、批量注册或多开账号才能获得的额度。</p>
-<p class="actions"><a class="btn primary" href="{REPO}/catalog/blob/main/CONTRIBUTING.md">查看接入规范</a> <a class="btn" href="{REPO}/catalog/issues/new/choose">提交一个平台</a> <a class="btn" href="mailto:kangletian@hotmail.com">邮件联系</a></p>"""
-    (OUT / "providers-join.html").write_text(page("平台入驻 - 羊毛switch", join, "提供免费额度的平台接入羊毛switch", nav="join"), encoding="utf-8")
-
+    for lang in ("zh", "en"):
+        Site(lang, cat, sq, providers, models, slug_of).build(dl_items, release)
     (OUT / "catalog.json").write_text(json.dumps(cat, ensure_ascii=False), encoding="utf-8")
     (OUT / "models.json").write_text(json.dumps(sq, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    feed = {"version": "https://jsonfeed.org/version/1.1", "title": "羊毛switch Providers", "home_page_url": "https://yangmaoswitch.github.io/website/",
-            "items": [{"id": p["id"], "title": p.get("name_zh") or p["name"], "content_text": "；".join(quota_text(q) for q in p["quotas"]),
-                       "url": f"https://yangmaoswitch.github.io/website/p/{p['id']}.html", "date_modified": p["last_verified"]} for p in providers]}
-    (OUT / "feed.json").write_text(json.dumps(feed, ensure_ascii=False, indent=1), encoding="utf-8")
-    llms = ["# 羊毛switch", "", "开源的大模型 Key 与用量管理桌面应用。本站汇总各平台的免费额度和可以免费调用的模型。",
-            "机器可读数据：catalog.json（平台与额度）、models.json（各平台模型列表：免费 / 用免费额度 / 付费，标价）", "", "## Providers", ""]
-    for p in providers:
-        llms.append(f"- {p.get('name_zh') or p['name']}（{'能' if p['api_usable'] else '不能'}当 API 用）：" + "；".join(quota_text(q) for q in p["quotas"]) + f"。注册 {p['signup']['url']}")
-    llms += ["", "## 免费模型（免费模型 / 用免费额度的平台）", ""]
-    for m in models:
-        ok = [o for o in m["offers"] if o["access"] != "paid"]
-        llms.append(f"- {m['name']}：" + "、".join(f"{pname(o['provider'])}（{ACCESS[o['access']][0]}，{o['model']}）" for o in ok))
-    (OUT / "llms.txt").write_text("\n".join(llms) + "\n", encoding="utf-8")
     (OUT / ".nojekyll").write_text("", encoding="utf-8")
-    print(f"ok: {len(models)} models, {len(providers)} providers -> {OUT}")
+    print(f"ok: {len(models)} models, {len(providers)} providers, zh + en -> {OUT}")
 
 
 if __name__ == "__main__":

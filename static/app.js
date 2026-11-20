@@ -16,7 +16,7 @@
         c.hidden = !ok;
         if (ok) shown++;
       });
-      mcount.textContent = "显示 " + shown + " 个";
+      mcount.textContent = mcount.dataset.tpl.replace("{n}", shown);
     };
     seg.addEventListener("click", function (ev) {
       var b = ev.target.closest("button");
@@ -47,7 +47,7 @@
       c.hidden = !ok;
       if (ok) shown++;
     });
-    count.textContent = "显示 " + shown + " 个";
+    count.textContent = count.dataset.tpl.replace("{n}", shown);
   }
   [q, region, overage, apiOnly, l3].forEach(function (el) { el.addEventListener("input", apply); });
   apply();
