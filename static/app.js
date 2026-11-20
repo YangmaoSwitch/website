@@ -3,7 +3,7 @@
   var mgrid = document.getElementById("mgrid");
   if (mgrid) {
     var mq = document.getElementById("mq"), macc = document.getElementById("macc"), mprov = document.getElementById("mprov"),
-      mcount = document.getElementById("mcount"), seg = document.getElementById("mcap"), cap = "";
+      mcount = document.getElementById("mcount"), seg = document.getElementById("mcap"), msort = document.getElementById("msort"), cap = "";
     var mcards = Array.prototype.slice.call(mgrid.querySelectorAll(".mcard"));
     // filters live in the URL so a filtered view can be shared and survives back/forward
     var params = new URLSearchParams(location.search);
@@ -11,6 +11,17 @@
     macc.value = params.get("access") || "";
     mprov.value = params.get("platform") || "";
     cap = params.get("cap") || "";
+    msort.value = params.get("sort") || "heat";
+    var order = function () {
+      var key = msort.value;
+      var val = function (c) { return key === "new" ? c.dataset.created : key === "platforms" ? +c.dataset.n : +c.dataset.heat; };
+      mcards.slice().sort(function (a, b) {
+        var x = val(a), y = val(b);
+        return x < y ? 1 : x > y ? -1 : (+b.dataset.heat) - (+a.dataset.heat);
+      }).forEach(function (c) { mgrid.appendChild(c); });
+    };
+    order();
+    msort.addEventListener("input", function () { order(); mapply(); });
     seg.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x.dataset.v === cap ? "true" : "false"); });
     var sync = function () {
       var p = new URLSearchParams();
@@ -18,6 +29,7 @@
       if (cap) p.set("cap", cap);
       if (macc.value) p.set("access", macc.value);
       if (mprov.value) p.set("platform", mprov.value);
+      if (msort.value !== "heat") p.set("sort", msort.value);
       var qs = p.toString();
       history.replaceState(null, "", location.pathname + (qs ? "?" + qs : ""));
     };

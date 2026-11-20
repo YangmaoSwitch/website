@@ -8,13 +8,16 @@ Data comes from the catalog repo's `dist` branch:
 
 Usage: python build.py [catalog.json] [models.json]   (paths or URLs; default: the published files)
 """
+import datetime as dt
 import hashlib
+import os
 import html
 import json
 import pathlib
 import re
 import shutil
 import sys
+import urllib.parse
 import urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parent
@@ -23,6 +26,7 @@ DIST = "https://raw.githubusercontent.com/YangmaoSwitch/catalog/dist"
 SITE = "https://yangmaoswitch.github.io/website/"
 REPO = "https://github.com/YangmaoSwitch"
 EMAIL = "kangletian@hotmail.com"
+API_BASE = os.environ.get("YM_API_BASE", "").rstrip("/")  # account service; empty until it is deployed
 RANK = {"free": 0, "quota": 1, "paid": 2}
 COLORS = ["#c2410c", "#1d4ed8", "#047857", "#6d28d9", "#b91c1c", "#0369a1", "#a16207", "#0f766e", "#be185d", "#4338ca"]
 
@@ -32,7 +36,29 @@ e = html.escape
 T = {
     "zh": {
         "brand": '羊毛<span>switch</span>', "brand_text": "羊毛switch", "html_lang": "zh-CN", "other": ("en", "English"),
-        "nav": {"models": "模型广场", "providers": "平台", "download": "下载", "join": "平台入驻"}, "get_app": "下载桌面端",
+        "nav": {"home": "首页", "models": "模型广场", "providers": "平台", "download": "下载", "join": "平台入驻"}, "get_app": "下载桌面端", "submit_btn": "提交 / 纠错",
+        "home_title": "羊毛switch - 哪些大模型可以免费调用", "home_h1": "哪些大模型可以免费调用",
+        "home_lead": "汇总 <b>{p}</b> 个平台的免费额度和 <b>{m}</b> 个可以免费调用的模型，按热度排序，列出每个平台的调用方式、免费额度和标价。",
+        "sec_hot": "热门免费模型", "sec_hot_sub": "按 OpenRouter 每日用量和提供平台数排序",
+        "sec_newfree": "新上免费用量", "sec_newfree_sub": "最近 14 天新出现的免费模型或免费额度",
+        "sec_newfree_empty": "最近 14 天没有新上的免费用量。数据每 6 小时更新一次。",
+        "sec_new": "新模型", "sec_new_sub": "最近 45 天上线、可以免费调用的模型",
+        "sec_forever": "不限期免费", "sec_forever_sub": "平台列为免费模型、不消耗额度（通常有限速），以平台公布为准",
+        "sec_more": "查看全部", "since": "{d} 起",
+        "sort_lbl": "排序", "sort_heat": "按热度", "sort_new": "最新上线", "sort_platforms": "平台最多",
+        "fix_btn": "纠错",
+        "sub": {"title": "提交 / 纠错", "lead": "提交新平台、新模型，或指出目录里的错误。登录后提交，我们核实后上架或更正，并在“我的提交”里回复处理结果。",
+                "not_ready": "账号系统还在准备中，暂时可以在 GitHub 上提交（需要 GitHub 账号）。", "gh": "在 GitHub 上提交",
+                "email": "邮箱", "email_ph": "you@example.com", "send": "发送验证码", "resend": "{n} 秒后可重发", "code": "验证码", "code_ph": "6 位数字",
+                "login": "登录", "or": "或", "github": "用 GitHub 登录", "signed_in": "已登录：{who}", "logout": "退出登录",
+                "kind": "类型", "kinds": {"correction": "纠错", "new_provider": "新平台", "new_model": "新模型或新额度", "other": "其他"},
+                "target": "对象（平台或模型）", "target_ph": "例如 siliconflow 或 deepseek/deepseek-v4.1-flash", "stitle": "标题", "stitle_ph": "一句话说明",
+                "body": "详细说明", "body_ph": "额度、条件、哪里不对……", "evidence": "官方依据链接", "evidence_ph": "https://…", "submit": "提交",
+                "sent_ok": "已提交，感谢。处理结果会显示在下方“我的提交”里。", "mine": "我的提交", "none": "还没有提交。",
+                "status": {"open": "待处理", "accepted": "已采纳", "rejected": "未采纳", "done": "已上线"}, "note": "回复：",
+                "errors": {"bad_email": "邮箱格式不对。", "too_soon": "请稍后再获取验证码。", "rate_limited": "操作太频繁，请稍后再试。", "mail_failed": "邮件发送失败，请稍后再试。",
+                           "code_expired": "验证码已失效，请重新获取。", "code_wrong": "验证码不对。", "not_signed_in": "请先登录。", "banned": "这个账号已不能提交。",
+                           "network": "连不上服务器，请稍后再试。", "invalid": "请检查填写的内容。"}},
         "footer": "额度和价格以各平台官方公布为准。羊毛switch 是开源项目（MIT 许可证），与所列平台无隶属关系。",
         "submit": "提交新平台或纠错", "contact": "联系",
         "unit": {"requests": "次", "tokens": "Token", "input_tokens": "输入 Token", "output_tokens": "输出 Token", "credits": "额度",
@@ -119,7 +145,29 @@ T = {
     },
     "en": {
         "brand": 'Yangmao<span>Switch</span>', "brand_text": "YangmaoSwitch", "html_lang": "en", "other": ("zh", "中文"),
-        "nav": {"models": "Models", "providers": "Providers", "download": "Download", "join": "For platforms"}, "get_app": "Get the app",
+        "nav": {"home": "Home", "models": "Models", "providers": "Providers", "download": "Download", "join": "For platforms"}, "get_app": "Get the app", "submit_btn": "Submit / Report",
+        "home_title": "YangmaoSwitch - LLMs you can call for free", "home_h1": "LLMs you can call for free",
+        "home_lead": "Free quotas of <b>{p}</b> platforms and <b>{m}</b> models you can call for free, ranked by popularity, with each platform's access, free quota and list price.",
+        "sec_hot": "Popular free models", "sec_hot_sub": "Ranked by OpenRouter daily usage and the number of platforms serving them",
+        "sec_newfree": "New free offers", "sec_newfree_sub": "Free models and free quotas that appeared in the last 14 days",
+        "sec_newfree_empty": "No new free offers in the last 14 days. Data updates every 6 hours.",
+        "sec_new": "New models", "sec_new_sub": "Released in the last 45 days and callable for free",
+        "sec_forever": "Free with no end date", "sec_forever_sub": "Listed as free models by the platform, not counted against a quota (usually rate-limited); per the platform's terms",
+        "sec_more": "See all", "since": "since {d}",
+        "sort_lbl": "Sort", "sort_heat": "Most popular", "sort_new": "Newest", "sort_platforms": "Most platforms",
+        "fix_btn": "Report an error",
+        "sub": {"title": "Submit / Report", "lead": "Submit a new platform or model, or report an error in the catalog. Sign in to submit; we verify each entry before listing or correcting it, and reply under My submissions.",
+                "not_ready": "Accounts are not available yet. Meanwhile you can submit on GitHub (a GitHub account is required).", "gh": "Submit on GitHub",
+                "email": "Email", "email_ph": "you@example.com", "send": "Send code", "resend": "Resend in {n}s", "code": "Code", "code_ph": "6 digits",
+                "login": "Sign in", "or": "or", "github": "Sign in with GitHub", "signed_in": "Signed in as {who}", "logout": "Sign out",
+                "kind": "Type", "kinds": {"correction": "Correction", "new_provider": "New platform", "new_model": "New model or quota", "other": "Other"},
+                "target": "Platform or model", "target_ph": "e.g. siliconflow or deepseek/deepseek-v4.1-flash", "stitle": "Title", "stitle_ph": "One line",
+                "body": "Details", "body_ph": "Quota, conditions, what is wrong…", "evidence": "Official source", "evidence_ph": "https://…", "submit": "Submit",
+                "sent_ok": "Submitted, thank you. The result will show under My submissions below.", "mine": "My submissions", "none": "No submissions yet.",
+                "status": {"open": "Open", "accepted": "Accepted", "rejected": "Declined", "done": "Live"}, "note": "Reply: ",
+                "errors": {"bad_email": "Check the email address.", "too_soon": "Wait a moment before requesting another code.", "rate_limited": "Too many attempts; try again later.",
+                           "mail_failed": "Could not send the email; try again later.", "code_expired": "The code has expired; request a new one.", "code_wrong": "Wrong code.",
+                           "not_signed_in": "Sign in first.", "banned": "This account can no longer submit.", "network": "Cannot reach the server; try again later.", "invalid": "Check the fields."}},
         "footer": "Quotas and prices are as published by each platform. YangmaoSwitch is open source (MIT) and not affiliated with the platforms listed.",
         "submit": "Submit a platform or a correction", "contact": "Contact",
         "unit": {"requests": "requests", "tokens": "tokens", "input_tokens": "input tokens", "output_tokens": "output tokens", "credits": "credits",
@@ -314,7 +362,7 @@ class Site:
         other_lang, other_label = self.t["other"]
         other = (home + "en/" if self.L == "zh" else home + "../") + rel
         alt_zh, alt_en = SITE + rel, SITE + "en/" + rel
-        links = [("models", "index.html"), ("providers", "providers.html"), ("download", "download.html"), ("join", "providers-join.html")]
+        links = [("home", "index.html"), ("models", "models.html"), ("providers", "providers.html"), ("download", "download.html"), ("join", "providers-join.html")]
         navs = "".join(f'<a href="{home}{h}"{" aria-current=page" if k == nav else ""}>{self.t["nav"][k]}</a>' for k, h in links)
         doc = f"""<!doctype html>
 <html lang="{self.t['html_lang']}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -332,6 +380,7 @@ class Site:
 <header><div class="bar"><a class="brand" href="{home}index.html" translate="no"><img src="{root}icon.png" alt="" width="26" height="26">{self.t['brand']}</a>
 <nav>{navs}<a href="{REPO}">GitHub</a></nav>
 <a class="lang" href="{other}" hreflang="{other_lang}" lang="{other_lang}" aria-label="{self.t['lang_label']}">{other_label}</a>
+<a class="btn small" href="{home}submit.html">{self.t['submit_btn']}</a>
 <a class="btn primary small" href="{home}download.html">{self.t['get_app']}</a></div></header>
 <main id="main">{body}</main>
 <footer><p>{self.t['footer']}
@@ -364,7 +413,8 @@ class Site:
         if self.L == "en":
             return m.get("description") or ""
         t = self.t
-        s = (t["gd_vendor"].format(v=m["vendor"]) if m.get("vendor") else "") + (t["gd_open"] if m.get("open_weights") or m.get("hugging_face_id") else "") + t["gd_model"]
+        lead = (t["gd_vendor"].format(v=m["vendor"]) if m.get("vendor") else "") + (t["gd_open"] if m.get("open_weights") or m.get("hugging_face_id") else "")
+        s = lead + t["gd_model"] if lead else ""
         bits = []
         if m.get("context_length"):
             bits.append(t["gd_ctx"].format(c=ctx_text(m["context_length"])))
@@ -391,7 +441,7 @@ class Site:
         search = " ".join([m["name"], m.get("vendor") or "", m["id"]] + [o["model"] for o in offers])
         tone = {"free": "ok", "quota": "blue", "paid": ""}[best]
         tag_html = f'<span class="mtag {tone}">{t["access"][best]}</span>' + "".join(f'<span class="mtag">{e(x)}</span>' for x in self.tags(m))
-        return f"""<a class="mcard" href="m/{e(m['slug'])}.html" data-search="{e(search.lower())}" data-caps="{' '.join(caps)}" data-providers=" {' '.join(o['provider'] for o in offers)} " data-access="{best}">
+        return f"""<a class="mcard" href="m/{e(m['slug'])}.html" data-search="{e(search.lower())}" data-caps="{' '.join(caps)}" data-providers=" {' '.join(o['provider'] for o in offers)} " data-access="{best}" data-heat="{m.get('heat', 0)}" data-created="{e(m.get('created') or '')}" data-n="{len(offers)}">
 <div class="mcard-head">{avatar(m.get('vendor') or m['name'], m.get('vendor') or offers[0]['provider'])}<div><b translate="no">{e(title)}</b><span>{e(plats)}</span></div></div>
 <p class="mdesc">{e(self.desc(m) or t['no_desc'])}</p>
 <div class="mtags">{tag_html}</div></a>"""
@@ -415,7 +465,7 @@ class Site:
             facts.append((t["weights"], f'<a href="https://huggingface.co/{e(m["hugging_face_id"])}" target="_blank" rel="noopener">{e(m["hugging_face_id"])}</a>'))
         d = self.desc(m)
         tag_html = "".join(f'<span class="mtag">{e(x)}</span>' for x in self.tags(m))
-        body = f"""<p class="crumb"><a href="../index.html">{t['nav']['models']}</a> / {e(m['name'])}</p>
+        body = f"""<p class="crumb"><a href="../models.html">{t['nav']['models']}</a> / {e(m['name'])}</p>
 <div class="mhead">{avatar(m.get('vendor') or m['name'], m.get('vendor') or m['offers'][0]['provider'], 'av lg')}<div><h1 translate="no">{e(m['name'])}</h1><p class="muted">{e(m.get('vendor') or '')}</p></div></div>
 {f'<p class="lead">{e(d)}</p>' if d else ''}
 <div class="mtags">{tag_html}</div>
@@ -423,6 +473,7 @@ class Site:
 <h2>{t['platforms_h']} <span class="muted">{len(m['offers'])}</span></h2>
 <div class="table-wrap"><table class="list"><thead><tr><th>{t['th_platform']}</th><th>{t['th_model']}</th><th>{t['th_access']}</th><th>{t['th_quota']}</th><th>{t['th_price']}</th></tr></thead><tbody>{''.join(rows)}</tbody></table></div>
 <p class="muted small">{t['m_note']}</p>
+<p class="actions"><a class="btn" href="../submit.html?kind=correction&amp;target={urllib.parse.quote(m['id'])}&amp;page=m/{e(m['slug'])}.html">{t['fix_btn']}</a></p>
 <p class="cta">{t['m_cta'].format(u='../download.html')}</p>"""
         self.write(f"m/{m['slug']}.html", t["m_title"].format(name=m["name"]), body, t["m_desc"].format(name=m["name"], n=len(m["offers"])), "models")
 
@@ -503,9 +554,47 @@ class Site:
 <h2>{t['models_h']}</h2>{models}
 <h2>{t['basic_h']}</h2><table class="kv">{''.join(f'<tr><th>{k}</th><td>{v}</td></tr>' for k, v in rows)}</table>
 {f'<h2>{t["terms_h"]}</h2><ul>{terms}</ul>' if terms else ''}
-<p class="actions">{' '.join(links)}</p>
+<p class="actions">{' '.join(links)} <a class="btn" href="../submit.html?kind=correction&amp;target={e(p['id'])}&amp;page=p/{e(p['id'])}.html">{t['fix_btn']}</a></p>
 <p class="cta">{t['p_cta'].format(u='../download.html')}</p>"""
         self.write(f"p/{p['id']}.html", t["pp_title"].format(name=name), body, summary, "providers")
+
+    def home_sections(self) -> str:
+        t, models = self.t, self.models
+        today = dt.date.today()
+        baseline = self.sq.get("baseline") or ""
+
+        def section(key: str, body: str, more: str) -> str:
+            return (f'<section class="home-sec"><div class="sec-head"><div><h2>{t["sec_" + key]}</h2><p class="muted">{t["sec_" + key + "_sub"]}</p></div>'
+                    f'<a href="{more}">{t["sec_more"]}</a></div>{body}</section>')
+
+        def days_ago(d: str | None) -> int:
+            try:
+                return (today - dt.date.fromisoformat((d or "")[:10])).days
+            except ValueError:
+                return 10**6
+
+        hot = sorted(models, key=lambda m: m.get("heat", 0), reverse=True)[:6]
+        out = [section("hot", '<div class="mgrid">' + "".join(self.model_card(m) for m in hot) + "</div>", "models.html")]
+
+        fresh = sorted(((o, m) for m in models for o in m["offers"] if o["access"] != "paid" and o.get("since") and o["since"] > baseline and days_ago(o["since"]) <= 14),
+                       key=lambda x: x[0]["since"], reverse=True)[:12]
+        if fresh:
+            rows = "".join(
+                f'<li><a href="m/{e(m["slug"])}.html"><span class="plat">{avatar(self.pname(o["provider"]), o["provider"], "av sm")}{e(self.pname(o["provider"]))}</span>'
+                f'<b translate="no">{e(m["name"])}</b><span class="mtag {dict(free="ok", quota="blue")[o["access"]]}">{t["access"][o["access"]]}</span>'
+                f'<span class="muted small">{t["since"].format(d=e(o["since"]))}</span></a></li>' for o, m in fresh)
+            body = f'<ul class="feed">{rows}</ul>'
+        else:
+            body = f'<p class="empty-note">{t["sec_newfree_empty"]}</p>'
+        out.append(section("newfree", body, "models.html?sort=new"))
+
+        new = sorted((m for m in models if days_ago(m.get("created")) <= 45), key=lambda m: m.get("created") or "", reverse=True)[:6]
+        if new:
+            out.append(section("new", '<div class="mgrid">' + "".join(self.model_card(m) for m in new) + "</div>", "models.html?sort=new"))
+
+        forever = [m for m in sorted(models, key=lambda m: m.get("heat", 0), reverse=True) if any(o["access"] == "free" for o in m["offers"])][:6]
+        out.append(section("forever", '<div class="mgrid">' + "".join(self.model_card(m) for m in forever) + "</div>", "models.html?access=free"))
+        return "".join(out)
 
     # ---------------------------------------------------------------- pages
     def build(self, dl_items: list[dict], release: dict | None):
@@ -519,20 +608,25 @@ class Site:
             f'<li><span class="plat">{avatar(self.pname(o["provider"]), o["provider"], "av sm")}{e(self.pname(o["provider"]))}</span>'
             f'<span class="mtag {dict(free="ok", quota="blue", paid="")[o["access"]]}">{t["access"][o["access"]]}</span></li>' for o in ex["offers"][:6])
         hero = f"""<section class="hero split"><div>
-<h1>{t['sq_h1']}</h1>
-<p class="lead">{t['sq_lead'].format(m=len(models), p=len(used), x=multi)}</p>
-<p class="muted">{t['sq_about']} {t['updated'].format(d=e((self.sq.get('generated_at') or '')[:10]), u=issues)}</p></div>
+<h1>{t['home_h1']}</h1>
+<p class="lead">{t['home_lead'].format(m=len(models), p=len(providers))}</p>
+<p class="muted">{t['sq_about']} {t['updated'].format(d=e((self.sq.get('generated_at') or '')[:10]), u='submit.html')}</p></div>
 <a class="example" href="m/{e(ex['slug'])}.html"><span class="ex-h">{t['ex_h'].format(n=len(ex['offers']))}</span>
 <span class="ex-model">{avatar(ex.get('vendor') or ex['name'], ex.get('vendor') or ex['offers'][0]['provider'])}<b translate="no">{e(ex['name'])}</b></span>
 <ul>{ex_rows}</ul><span class="ex-more">{t['ex_more']}</span></a></section>"""
+        self.write("index.html", t["home_title"], hero + self.home_sections(), t["sq_desc"], "home")
+        hero = f"""<section class="hero"><h1>{t['sq_h1']}</h1>
+<p class="lead">{t['sq_lead'].format(m=len(models), p=len(used), x=multi)}</p>
+<p class="muted">{t['updated'].format(d=e((self.sq.get('generated_at') or '')[:10]), u='submit.html')}</p></section>"""
         filters = f"""<div class="toolbar">
 <input id="mq" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="{t['search_model']}" aria-label="{t['search_model'].rstrip('…')}">
 <div class="seg" id="mcap" role="group" aria-label="{t['lbl_cap']}"><button data-v="" aria-pressed="true">{t['all']}</button><button data-v="vision">{t['cap_vision']}</button><button data-v="tools">{t['cap_tools']}</button><button data-v="reasoning">{t['cap_reasoning']}</button></div>
 <select id="macc" name="access" aria-label="{t['lbl_acc']}"><option value="">{t['acc_all']}</option><option value="free">{t['acc_free']}</option><option value="quota">{t['acc_quota']}</option></select>
 <select id="mprov" name="platform" aria-label="{t['lbl_prov']}"><option value="">{t['all_platforms']}</option>{''.join(f'<option value="{e(x)}">{e(self.pname(x))}</option>' for x in used)}</select>
+<select id="msort" name="sort" aria-label="{t['sort_lbl']}"><option value="heat">{t['sort_heat']}</option><option value="new">{t['sort_new']}</option><option value="platforms">{t['sort_platforms']}</option></select>
 <span id="mcount" class="muted" aria-live="polite" data-tpl="{e(t['showing'])}"></span></div>"""
         grid = '<section class="mgrid" id="mgrid">' + "".join(self.model_card(m) for m in models) + "</section>"
-        self.write("index.html", t["sq_title"], hero + filters + grid, t["sq_desc"], "models")
+        self.write("models.html", t["sq_title"], hero + filters + grid, t["sq_desc"], "models")
         for m in models:
             self.model_page(m)
 
@@ -569,6 +663,31 @@ class Site:
 <h2>{t['d_steps_h']}</h2><ol>{''.join(f'<li>{x}</li>' for x in t['d_steps'])}</ol>
 <p class="muted">{t['d_foot']}</p>"""
         self.write("download.html", t["d_title"], download, t["d_desc"], "download")
+
+        sub = t["sub"]
+        kinds = "".join(f'<option value="{k}">{v}</option>' for k, v in sub["kinds"].items())
+        submit = f"""<h1>{sub['title']}</h1><p class="lead">{sub['lead']}</p>
+<div id="submit-app" data-api="{e(API_BASE)}" data-lang="{self.L}" data-text="{e(json.dumps(sub, ensure_ascii=False))}">
+<div class="panel" id="s-unavailable" hidden><p>{sub['not_ready']}</p><p class="actions"><a class="btn" href="{issues}">{sub['gh']}</a></p></div>
+<form class="panel" id="s-login" hidden>
+<label>{sub['email']}<input id="s-email" name="email" type="email" autocomplete="email" spellcheck="false" placeholder="{sub['email_ph']}" required></label>
+<div class="row"><label>{sub['code']}<input id="s-code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{{6}}" maxlength="6" placeholder="{sub['code_ph']}"></label>
+<button type="button" class="btn" id="s-send">{sub['send']}</button></div>
+<p class="actions"><button class="btn primary" type="submit">{sub['login']}</button><span class="muted" id="s-gh-or" hidden>{sub['or']}</span><button type="button" class="btn" id="s-gh" hidden>{sub['github']}</button></p>
+<p class="form-msg" id="s-login-msg" role="status" aria-live="polite"></p></form>
+<div id="s-main" hidden>
+<p class="who"><span id="s-who"></span> <button type="button" class="linkbtn" id="s-logout">{sub['logout']}</button></p>
+<form class="panel" id="s-form">
+<div class="row"><label>{sub['kind']}<select id="s-kind" name="kind">{kinds}</select></label>
+<label class="grow">{sub['target']}<input id="s-target" name="target" autocomplete="off" spellcheck="false" maxlength="200" placeholder="{sub['target_ph']}"></label></div>
+<label>{sub['stitle']}<input id="s-title" name="title" autocomplete="off" maxlength="120" required placeholder="{sub['stitle_ph']}"></label>
+<label>{sub['body']}<textarea id="s-body" name="body" rows="6" maxlength="5000" required placeholder="{sub['body_ph']}"></textarea></label>
+<label>{sub['evidence']}<input id="s-evidence" name="evidence_url" type="url" autocomplete="off" maxlength="500" placeholder="{sub['evidence_ph']}"></label>
+<p class="actions"><button class="btn primary" type="submit">{sub['submit']}</button></p>
+<p class="form-msg" id="s-msg" role="status" aria-live="polite"></p></form>
+<h2>{sub['mine']}</h2><ul class="mine" id="s-mine"></ul></div></div>
+<script src="{'' if self.L == 'zh' else '../'}submit.js" defer></script>"""
+        self.write("submit.html", f"{sub['title']} - {t['brand_text']}", submit, sub["lead"], "")
 
         th = "".join(f"<th>{x}</th>" for x in t["j_th"])
         jr = "".join(f"<tr><td>{a}</td><td>{b}</td><td>{c}</td></tr>" for a, b, c in t["j_rows"])
@@ -613,7 +732,7 @@ def main() -> None:
     if OUT.exists():
         shutil.rmtree(OUT)
     (OUT / "download").mkdir(parents=True)
-    for f in ("style.css", "app.js", "icon.png"):
+    for f in ("style.css", "app.js", "submit.js", "icon.png"):
         shutil.copy(ROOT / "static" / f, OUT / f)
     shutil.copytree(ROOT / "static" / "fonts", OUT / "fonts")
     dl_items = []
