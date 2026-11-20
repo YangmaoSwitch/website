@@ -140,7 +140,7 @@ T = {
                    ("L2 半自动", "再提供密钥页链接、密钥前缀、查询剩余额度的接口或响应头", "粘贴密钥即自动识别；本机按真实剩余额度限量"),
                    ("L3 全自动", "再提供 OAuth 2.0 PKCE 公共客户端，允许回调到 127.0.0.1 任意端口，授权后签发密钥", "桌面端一键开通")],
         "j_models": "也欢迎提供无需密钥即可访问的公开模型列表接口（OpenAI 格式的 <code>/models</code>），并说明每个模型是免费、用免费额度还是付费，方便模型广场保持完整。",
-        "j_no": "不收录返利或邀请链接、API 中转站，以及需要虚拟号码、批量注册或多开账号才能获得的额度。",
+        "j_no": "官方平台、聚合平台和 API 中转站的免费额度都可以收录。注册链接一律用平台官方地址，不放返利或邀请链接；需要虚拟号码、批量注册或多开账号才能拿到的额度不收。",
         "j_spec": "查看接入规范", "j_submit": "提交一个平台", "j_mail": "邮件联系",
         # llms
         "llms_title": "# 羊毛switch", "llms_intro": "开源的大模型密钥与用量管理桌面应用。本站汇总各平台的免费额度和可以免费调用的模型。",
@@ -246,7 +246,7 @@ T = {
                    ("L2 Assisted", "Also the key page URL, the key prefix, and an endpoint or response headers reporting the remaining quota", "Keys are recognized on paste; usage is capped against the real remaining quota"),
                    ("L3 Automatic", "Also an OAuth 2.0 PKCE public client that allows redirects to any 127.0.0.1 port and issues a key on authorization", "One-click sign-up in the app")],
         "j_models": "A public model list endpoint that needs no key (OpenAI-style <code>/models</code>), with whether each model is free, on free quota or paid, helps keep the model list complete.",
-        "j_no": "We do not list referral or invite links, API resellers, or quotas that require virtual phone numbers, bulk sign-ups or multiple accounts.",
+        "j_no": "Free quotas from official platforms, aggregators and API resellers can all be listed. Sign-up links always point to the platform's official address, never to referral or invite links. Quotas that require virtual phone numbers, bulk sign-ups or multiple accounts are not listed.",
         "j_spec": "Integration guide", "j_submit": "Submit a platform", "j_mail": "Email us",
         "llms_title": "# YangmaoSwitch", "llms_intro": "Open-source desktop app for managing LLM API keys and usage. This site lists free quotas and the models you can call for free.",
         "llms_data": "Machine-readable data: catalog.json (platforms and quotas), models.json (each platform's models: free / free quota / paid, list prices)",
