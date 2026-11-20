@@ -54,6 +54,7 @@ T = {
         "home_lead": "收录 <b>{p}</b> 个供应商、<b>{m}</b> 个可以免费调用的模型。每条额度都链接到供应商原文，数据每 6 小时刷新一次。",
         "sec_hot": "热门免费模型", "sec_hot_sub": "按 OpenRouter 每日用量和提供它的供应商数排序",
         "blog_title": "博客 - 羊毛switch", "blog_h1": "博客", "blog_lead": "目录怎么做、数据从哪来、桌面应用的更新说明。",
+        "models_short": "{t} 个（免费 {f} · 用免费额度 {q}）",
         "sec_prov": "热门供应商", "sec_prov_sub": "按提供的热门免费模型排序",
         "sec_newfree": "新上免费用量", "sec_newfree_sub": "最近 14 天新出现的免费模型或免费额度",
         "sec_newfree_empty": "最近 14 天没有新上的免费用量。数据每 6 小时更新一次。",
@@ -172,6 +173,7 @@ T = {
         "home_lead": "<b>{m}</b> models you can call for free across <b>{p}</b> providers. Every quota links to the provider’s own terms, and the data refreshes every 6 hours.",
         "sec_hot": "Popular free models", "sec_hot_sub": "Ranked by OpenRouter daily usage and the number of providers serving them",
         "blog_title": "Blog - YangmaoSwitch", "blog_h1": "Blog", "blog_lead": "How the catalog is built, where the data comes from, and desktop app release notes.",
+        "models_short": "{t} ({f} free · {q} on free quota)",
         "sec_prov": "Popular providers", "sec_prov_sub": "Ranked by the popular free models they serve",
         "sec_newfree": "New free offers", "sec_newfree_sub": "Free models and free quotas that appeared in the last 14 days",
         "sec_newfree_empty": "No new free offers in the last 14 days. Data updates every 6 hours.",
@@ -410,6 +412,8 @@ class Site:
             parts = [t["limit_unknown"].format(period=period, unit=unit)]
         else:
             amount = f"{q['amount']:,.0f}" if float(q["amount"]).is_integer() else str(q["amount"])
+            if self.L == "en" and q["amount"] == 1 and unit.endswith("s"):
+                unit = unit[:-1]
             parts = [f"{period} {amount} {unit}" if self.L == "zh" else (f"{amount} {unit} {period}" if q["period"] != "one-time" else f"{amount} {unit}, one-time")]
         for k in ("models", "condition"):
             v = self.qfield(p, i, k)
@@ -574,14 +578,20 @@ class Site:
         mc = f'<span>{t["models_count"].format(t=pm["total"], f=pm["free"], q=pm["quota"])}</span>' if pm and pm["total"] else ""
         summary = self.ptext(p, "summary")
         search = " ".join([p["name"], p.get("name_zh", ""), summary, " ".join(self.ptags(p))])
-        return f"""<article class="card" data-tags="{e(' '.join(tg))}" data-search="{e(search.lower())}">
-<div class="card-head">{provider_logo(p['id'])}<h3><a href="p/{e(p['id'])}.html">{e(name)}</a></h3>{''.join(badges)}</div>
-{f'<p>{e(summary)}</p>' if summary else ''}
+        mc_text = t["models_short"].format(t=pm["total"], f=pm["free"], q=pm["quota"]) if pm and pm["total"] else "—"
+        quotas = "".join(
+            f'<li><a href="{e(q["evidence"])}" rel="nofollow noopener" target="_blank" title="{e(self.quota_text(p, i))}">{e(self.quota_text(p, i))}</a></li>'
+            for i, q in enumerate(p["quotas"][:3]))
+        # fixed slots so every card in a row lines up: head, summary (2 lines), quotas (3 lines), facts, footer
+        return f"""<article class="card pcard-full" data-tags="{e(' '.join(tg))}" data-search="{e(search.lower())}">
+<div class="card-head">{provider_logo(p['id'])}<h3><a href="p/{e(p['id'])}.html" title="{e(name)}">{e(name)}</a></h3><span class="badges">{''.join(badges)}</span></div>
+<p class="card-sum">{e(summary)}</p>
 <ul class="quotas">{quotas}</ul>
-<p class="meta"><span>{t['signup']}{e(req)}</span><span{over_cls}>{t['overage_l']}{t['overage'][p['overage']]}</span>{mc}</p>
-<p class="actions"><a class="btn" href="{e(p['signup']['url'])}" rel="nofollow noopener" target="_blank">{t['go_signup']}</a>
-<a class="btn" href="p/{e(p['id'])}.html">{t['details']}</a></p>
-<p class="foot">{t['verified'].format(d=e(p['last_verified']))}</p></article>"""
+<dl class="card-facts"><dt>{t['signup'].rstrip('：: ')}</dt><dd title="{e(req)}">{e(req)}</dd>
+<dt>{t['overage_l'].rstrip('：: ')}</dt><dd{over_cls}>{t['overage'][p['overage']]}</dd>
+<dt>{t['models_h']}</dt><dd>{mc_text}</dd></dl>
+<div class="card-foot"><a class="btn" href="{e(p['signup']['url'])}" rel="nofollow noopener" target="_blank">{t['go_signup']}</a>
+<a class="btn" href="p/{e(p['id'])}.html">{t['details']}</a><span class="foot">{t['verified'].format(d=e(p['last_verified']))}</span></div></article>"""
 
     def provider_page(self, p: dict):
         t, pm = self.t, self.pmodels.get(p["id"])
