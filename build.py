@@ -51,7 +51,7 @@ T = {
         "home_app": "桌面应用把各供应商的密钥存在系统钥匙串里，给 Cline、Cherry Studio 等工具提供一个本机地址，把请求转给还有额度的账号，用到 90% 就停。",
         "home_submit": "目录尽量保持最新、完整。发现遗漏或错误，欢迎用户和供应商<a href=\"{u}\">提交</a>，我们核实后上架。",
         "tracker_cap": "热度前 {n} 的模型在各供应商的提供方式", "not_offered": "不提供",
-        "home_lead": "收录 <b>{p}</b> 个供应商、<b>{m}</b> 个可以免费调用的模型。每条额度都链接到供应商原文，数据每 6 小时刷新一次。",
+        "home_lead": "收录 <b>{m}</b> 个可以免费调用的模型。每条额度都链接到供应商原文，数据每 6 小时刷新一次。",
         "sec_hot": "热门免费模型", "sec_hot_sub": "按 OpenRouter 每日用量和提供它的供应商数排序",
         "blog_title": "博客 - 羊毛switch", "blog_h1": "博客", "blog_lead": "目录怎么做、数据从哪来、桌面应用的更新说明。",
         "models_short": "{t} 个（免费 {f} · 用免费额度 {q}）",
@@ -100,7 +100,7 @@ T = {
         "sq_title": "羊毛switch - 模型广场：哪些大模型可以免费调用",
         "sq_desc": "汇总各供应商可以免费调用的大模型，列出每个供应商的调用方式、免费额度和标价。开源的密钥与用量管理桌面应用。",
         "sq_h1": "模型广场",
-        "sq_lead": "收录 <b>{m}</b> 个可以免费调用的模型，以及提供它们的 <b>{p}</b> 个供应商；其中 {x} 个模型在多个供应商都能用。点开模型可以看到每个供应商的调用方式、免费额度和标价。",
+        "sq_lead": "收录 <b>{m}</b> 个可以免费调用的模型。点开模型可以看到每个供应商的调用方式、免费额度和标价。",
         "sq_about": "羊毛switch 是开源的密钥管理和用量管理桌面应用：在本机保存各供应商的密钥，按免费额度记账和限量。",
         "updated": "数据更新于 {d}，尽量保持最新且完整，欢迎用户和供应商<a href=\"{u}\">提交</a>，我们核实后上架。",
         "search_model": "搜索模型名称…", "skip": "跳到正文", "lbl_cap": "能力", "lbl_acc": "调用方式", "lbl_prov": "供应商", "lbl_region": "地区", "lbl_over": "超额处理",
@@ -119,7 +119,7 @@ T = {
         "gd_reason": "支持推理（思考）模式", "gd_avail": "目前可在 {n} 个供应商调用，其中 {k} 个可以免费或用免费额度调用。", "gd_join": "，", "gd_end": "。",
         # providers
         "p_title": "供应商 - 羊毛switch", "p_desc": "各供应商大模型免费 API 额度，附官方依据。", "p_h1": "供应商",
-        "p_lead": "收录 {n} 个提供免费额度的供应商（其中 {a} 个能当 API 用），每条额度都附官方依据。",
+        "p_lead": "收录提供免费额度的供应商，每条额度都附官方依据。",
         "p_updated": "目录更新于 {d} · 欢迎用户和供应商<a href=\"{u}\">提交</a>，我们核实后上架。",
         "search_p": "搜索供应商、标签…", "all_regions": "全部地区", "r_cn": "国内", "r_global": "海外", "ov_any": "超额处理不限", "ov_blocked": "只看用完即停",
         "api_only": "只看能当 API 用的", "l3_only": "只看能一键开通的",
@@ -170,7 +170,7 @@ T = {
         "home_app": "The desktop app keeps your keys in the system keychain, gives Cline, Cherry Studio and other tools one local address, and sends each request to an account with quota left. It stops at 90% of each free quota.",
         "home_submit": "We aim to keep the catalog current and complete. Users and providers can <a href=\"{u}\">submit</a> missing or wrong entries, and we verify them before listing.",
         "tracker_cap": "The top {n} models by popularity, provider by provider", "not_offered": "Not offered",
-        "home_lead": "<b>{m}</b> models you can call for free across <b>{p}</b> providers. Every quota links to the provider’s own terms, and the data refreshes every 6 hours.",
+        "home_lead": "<b>{m}</b> models you can call for free. Every quota links to the provider’s own terms, and the data refreshes every 6 hours.",
         "sec_hot": "Popular free models", "sec_hot_sub": "Ranked by OpenRouter daily usage and the number of providers serving them",
         "blog_title": "Blog - YangmaoSwitch", "blog_h1": "Blog", "blog_lead": "How the catalog is built, where the data comes from, and desktop app release notes.",
         "models_short": "{t} ({f} free · {q} on free quota)",
@@ -218,7 +218,7 @@ T = {
         "sq_title": "YangmaoSwitch - Models you can call for free",
         "sq_desc": "Large language models you can call for free, with every provider that serves them: access, free quota and list price. Open-source key and usage manager.",
         "sq_h1": "Models",
-        "sq_lead": "<b>{m}</b> models you can call for free, served by <b>{p}</b> providers; {x} of them are available on more than one. Open a model to see each provider's access, free quota and list price.",
+        "sq_lead": "<b>{m}</b> models you can call for free. Open a model to see each provider's access, free quota and list price.",
         "sq_about": "YangmaoSwitch is an open-source desktop app for managing your API keys and usage: keys stay on your computer, and calls are metered and capped against each free quota.",
         "updated": "Data updated {d}. We aim to keep it current and complete; users and providers are welcome to <a href=\"{u}\">submit</a> entries, which we verify before listing.",
         "search_model": "Search models…", "skip": "Skip to content", "lbl_cap": "Capability", "lbl_acc": "Access", "lbl_prov": "Provider", "lbl_region": "Region", "lbl_over": "Overage policy",
@@ -232,7 +232,7 @@ T = {
         "price_free": "Free",
         "m_cta": "Add these providers' keys to the <a href=\"{u}\">YangmaoSwitch desktop app</a> and its local endpoint picks an account with quota left for each model.",
         "p_title": "Providers - YangmaoSwitch", "p_desc": "Free API quotas of LLM providers, each with an official source.", "p_h1": "Providers",
-        "p_lead": "{n} providers with free quotas ({a} usable as an API), each quota with an official source.",
+        "p_lead": "Providers with free quotas, each quota with an official source.",
         "p_updated": "Catalog updated {d} · Users and providers are welcome to <a href=\"{u}\">submit</a> entries, which we verify before listing.",
         "search_p": "Search providers and tags…", "all_regions": "All regions", "r_cn": "China", "r_global": "Global", "ov_any": "Any overage policy", "ov_blocked": "Stops when used up",
         "api_only": "Usable as an API", "l3_only": "One-click sign-up",
@@ -462,7 +462,7 @@ class Site:
 <header><div class="bar"><a class="brand" href="{home}index.html" translate="no"><img src="{root}icon.png" alt="" width="26" height="26">{self.t['brand']}</a>
 <nav>{navs}</nav>
 <div class="tools">
-<a class="icon-link" href="{other}" hreflang="{other_lang}" lang="{other_lang}" aria-label="{self.t['lang_label']}" title="{self.t['lang_label']}">{ICON_LANG}<span>{other_label}</span></a>
+<a class="icon-link" href="{other}" hreflang="{other_lang}" lang="{other_lang}" aria-label="{self.t['lang_label']}" title="{self.t['lang_label']}">{ICON_LANG}</a>
 <a class="icon-link" href="{home}submit.html" aria-label="{self.t['submit_btn']}" title="{self.t['submit_btn']}">{ICON_SUBMIT}</a>
 <a class="icon-link" href="{REPO}" aria-label="GitHub" title="GitHub">{ICON_GITHUB}</a>
 <a class="btn primary small" href="{home}download.html">{ICON_DOWNLOAD}{self.t['get_app']}</a></div></div></header>
