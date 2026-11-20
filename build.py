@@ -462,8 +462,8 @@ class Site:
 <header><div class="bar"><a class="brand" href="{home}index.html" translate="no"><img src="{root}icon.png" alt="" width="26" height="26">{self.t['brand']}</a>
 <nav>{navs}</nav>
 <div class="tools">
-<a class="icon-link" href="{other}" hreflang="{other_lang}" lang="{other_lang}" aria-label="{self.t['lang_label']}" title="{self.t['lang_label']}">{ICON_LANG}</a>
 <a class="icon-link" href="{home}submit.html" aria-label="{self.t['submit_btn']}" title="{self.t['submit_btn']}">{ICON_SUBMIT}</a>
+<a class="icon-link" href="{other}" hreflang="{other_lang}" lang="{other_lang}" aria-label="{self.t['lang_label']}" title="{self.t['lang_label']}">{ICON_LANG}</a>
 <a class="icon-link" href="{REPO}" aria-label="GitHub" title="GitHub">{ICON_GITHUB}</a>
 <a class="btn primary small" href="{home}download.html">{ICON_DOWNLOAD}{self.t['get_app']}</a></div></div></header>
 <main id="main">{body}</main>
@@ -735,9 +735,7 @@ class Site:
 <p class="muted">{t['home_app']}</p></div>
 {self.tracker(models)}</section>"""
         self.write("index.html", t["home_title"], hero + self.home_sections(), t["home_desc"], "home")
-        hero = f"""<section class="hero"><h1>{t['sq_h1']}</h1>
-<p class="lead">{t['sq_lead'].format(m=len(models), p=len(used), x=multi)}</p>
-<p class="muted">{t['updated'].format(d=e((self.sq.get('generated_at') or '')[:10]), u='submit.html')}</p></section>"""
+        hero = f"""<section class="hero"><h1>{t['sq_h1']}</h1></section>"""
         filters = f"""<div class="toolbar">
 <input id="mq" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="{t['search_model']}" aria-label="{t['search_model'].rstrip('…')}">
 <div class="seg" id="mcap" role="group" aria-label="{t['lbl_cap']}"><button data-v="" aria-pressed="true">{t['all']}</button><button data-v="vision">{t['cap_vision']}</button><button data-v="tools">{t['cap_tools']}</button><button data-v="reasoning">{t['cap_reasoning']}</button></div>
