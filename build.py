@@ -845,13 +845,11 @@ class Site:
 def main() -> None:
     cat = load(sys.argv[1] if len(sys.argv) > 1 else f"{DIST}/catalog.json")
     sq = load(sys.argv[2] if len(sys.argv) > 2 else f"{DIST}/models.json")
-    # providers rank by the popularity of the models they serve for free or on a free quota
-    pheat: dict[str, float] = {}
-    for m in sq["models"]:
-        for o in m["offers"]:
-            if o["access"] != "paid":
-                pheat[o["provider"]] = pheat.get(o["provider"], 0) + (m.get("heat") or 0)
-    providers = sorted(cat["providers"], key=lambda p: (-pheat.get(p["id"], 0), p["name"].lower()))
+    # providers rank by the catalog's score: popularity of the models each serves without charge, weighted by how
+    # lasting the access is (free models x3, renewing free quota x1, one-time gift x0.3); unverified entries last
+    pinfo = sq.get("providers") or {}
+    pheat = {pid: v.get("score", 0) for pid, v in pinfo.items()}
+    providers = sorted(cat["providers"], key=lambda p: (p.get("status") != "verified", -pheat.get(p["id"], 0), p["name"].lower()))
     models = sq["models"]
     seen: set[str] = set()
     slug_of: dict[str, str] = {}
