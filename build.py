@@ -37,11 +37,13 @@ T = {
     "zh": {
         "brand": '<span class="name">羊毛<span>switch</span></span>', "brand_text": "羊毛switch", "html_lang": "zh-CN", "other": ("en", "English"),
         "nav": {"home": "首页", "models": "模型广场", "providers": "平台", "download": "下载", "join": "平台入驻"}, "get_app": "下载桌面端", "submit_btn": "提交 / 纠错",
-        "home_title": "羊毛switch - 跟踪免费大模型平台", "home_h1": "跟踪免费大模型平台",
-        "home_desc": "跟踪各平台的免费大模型：哪些平台在提供、怎么计费、送多少额度、标价多少，额度规则附官方链接。",
-        "home_about": "数据每 6 小时更新一次，最近一次是 {d}。配套的开源桌面应用把各平台的密钥存在你自己的电脑上，按免费额度记账，用到 90% 就停止转发，比例可以调。",
+        "home_title": "羊毛switch - 免费大模型，哪家给、给多少", "home_h1": "免费大模型，<br>哪家给、给多少",
+        "home_desc": "跟踪各平台的免费大模型：哪些是免费模型、哪些消耗赠送额度、哪些要付费，额度和标价附官方出处，每 6 小时刷新。",
+        "home_cta": "进入模型广场", "home_fresh": "每 6 小时刷新，最近一次 {d}",
+        "home_app": "想在自己的工具里直接调用？<a href=\"{u}\">桌面应用</a>把密钥留在你的电脑上，按免费额度记账，快用完时停止转发。",
         "home_submit": "目录尽量保持最新、完整。发现遗漏或错误，欢迎用户和平台方<a href=\"{u}\">提交</a>，我们核实后上架。",
-        "home_lead": "收录 <b>{p}</b> 个平台、<b>{m}</b> 个可以免费调用的模型。点开一个模型，能看到哪些平台在提供、怎么计费、送多少额度、标价多少。每条额度规则都附官方链接。",
+        "tracker_cap": "热度前 {n} 的模型，在各平台怎么用", "not_offered": "不提供",
+        "home_lead": "我们跟踪 <b>{p}</b> 个平台上的 <b>{m}</b> 个模型，标出哪些是免费模型、哪些消耗赠送额度、哪些要付费。每条额度和标价都附平台自己的出处。",
         "sec_hot": "热门免费模型", "sec_hot_sub": "按 OpenRouter 每日用量和提供平台数排序",
         "sec_newfree": "新上免费用量", "sec_newfree_sub": "最近 14 天新出现的免费模型或免费额度",
         "sec_newfree_empty": "最近 14 天没有新上的免费用量。数据每 6 小时更新一次。",
@@ -149,11 +151,13 @@ T = {
     "en": {
         "brand": '<span class="name">Yangmao<span>Switch</span></span>', "brand_text": "YangmaoSwitch", "html_lang": "en", "other": ("zh", "中文"),
         "nav": {"home": "Home", "models": "Models", "providers": "Providers", "download": "Download", "join": "For platforms"}, "get_app": "Get the app", "submit_btn": "Submit / Report",
-        "home_title": "YangmaoSwitch - Tracking free LLM platforms", "home_h1": "Tracking free LLM platforms",
-        "home_desc": "Tracking LLM platforms with free quotas: who serves each model, how it is billed, the free quota and the list price, with official sources.",
-        "home_about": "Data refreshes every 6 hours; last update {d}. The open-source desktop app keeps your keys on your own computer, meters usage against each free quota and stops forwarding at 90% of it. The threshold is adjustable.",
+        "home_title": "YangmaoSwitch - Free LLMs, platform by platform", "home_h1": "Free LLMs,<br>platform by platform",
+        "home_desc": "Which LLM platforms offer free models or free quotas, and how much: access, quotas and list prices with official sources, refreshed every 6 hours.",
+        "home_cta": "Browse the models", "home_fresh": "Refreshed every 6 hours; last update {d}",
+        "home_app": "Want to call them from your own tools? The <a href=\"{u}\">desktop app</a> keeps your keys on your computer, meters each free quota and stops forwarding before it runs out.",
         "home_submit": "We aim to keep the catalog current and complete. Users and platforms can <a href=\"{u}\">submit</a> missing or wrong entries, and we verify them before listing.",
-        "home_lead": "<b>{p}</b> platforms and <b>{m}</b> models you can call for free. Open a model to see which platforms serve it, how each one bills it, the free quota and the list price. Every quota rule links to its official source.",
+        "tracker_cap": "The {n} most popular models, platform by platform", "not_offered": "Not offered",
+        "home_lead": "We track <b>{m}</b> models on <b>{p}</b> platforms and mark which are free, which draw on a free quota and which are paid. Every quota and price links to the platform’s own source.",
         "sec_hot": "Popular free models", "sec_hot_sub": "Ranked by OpenRouter daily usage and the number of platforms serving them",
         "sec_newfree": "New free offers", "sec_newfree_sub": "Free models and free quotas that appeared in the last 14 days",
         "sec_newfree_empty": "No new free offers in the last 14 days. Data updates every 6 hours.",
@@ -564,6 +568,35 @@ class Site:
 <p class="cta">{t['p_cta'].format(u='../download.html')}</p>"""
         self.write(f"p/{p['id']}.html", t["pp_title"].format(name=name), body, summary, "providers")
 
+    def tracker(self, models: list) -> str:
+        """The hero visual: the most popular models against the platforms that serve them, one cell per pair."""
+        t = self.t
+        rows = sorted(models, key=lambda m: m.get("heat", 0), reverse=True)[:8]
+        count: dict[str, int] = {}
+        for m in rows:
+            for o in m["offers"]:
+                count[o["provider"]] = count.get(o["provider"], 0) + (2 if o["access"] != "paid" else 1)
+        cols = sorted(count, key=lambda x: (-count[x], self.pname(x)))[:8]
+        def short(pid: str) -> str:  # column labels: drop parentheses, keep at most two words
+            n = re.sub(r"\s*\(.*?\)", "", self.pname(pid)).strip()
+            w = n.split()
+            return " ".join(w[:2]) if len(n) > 16 and len(" ".join(w[:2])) <= 18 else (w[0] if len(n) > 16 else n)
+        head = "".join(f'<th scope="col"><a href="p/{e(c)}.html" title="{e(self.pname(c))}"><span>{e(short(c))}</span></a></th>' for c in cols)
+        body = []
+        for m in rows:
+            by = {o["provider"]: o["access"] for o in m["offers"]}
+            cells = []
+            for c in cols:
+                a = by.get(c)
+                label = f"{m['name']} · {self.pname(c)} · {t['access'][a] if a else t['not_offered']}"
+                cells.append(f'<td><span class="cell {a or "none"}" role="img" aria-label="{e(label)}" title="{e(label)}"></span></td>')
+            body.append(f'<tr><th scope="row"><a href="m/{e(m["slug"])}.html" translate="no">{e(m["name"])}</a></th>{"".join(cells)}</tr>')
+        legend = "".join(f'<span><i class="cell {k}"></i>{v}</span>' for k, v in
+                         (("free", t["access"]["free"]), ("quota", t["access"]["quota"]), ("paid", t["access"]["paid"]), ("none", t["not_offered"])))
+        return f"""<figure class="tracker"><figcaption>{t['tracker_cap'].format(n=len(rows))}</figcaption>
+<div class="tracker-scroll"><table><thead><tr><td></td>{head}</tr></thead><tbody>{''.join(body)}</tbody></table></div>
+<div class="legend">{legend}</div></figure>"""
+
     def home_sections(self) -> str:
         t, models = self.t, self.models
         today = dt.date.today()
@@ -609,18 +642,12 @@ class Site:
 
         used = sorted({o["provider"] for m in models for o in m["offers"]}, key=lambda x: self.pname(x).lower())
         multi = sum(len(m["offers"]) > 1 for m in models)
-        ex = max(models, key=lambda m: (sum(o["access"] != "paid" for o in m["offers"]), len(m["offers"])))
-        ex_rows = "".join(
-            f'<li><span class="plat">{avatar(self.pname(o["provider"]), o["provider"], "av sm")}{e(self.pname(o["provider"]))}</span>'
-            f'<span class="mtag {dict(free="ok", quota="blue", paid="")[o["access"]]}">{t["access"][o["access"]]}</span></li>' for o in ex["offers"][:6])
-        hero = f"""<section class="hero split"><div>
+        hero = f"""<section class="hero split home-hero"><div class="hero-text">
 <h1>{t['home_h1']}</h1>
 <p class="lead">{t['home_lead'].format(m=len(models), p=len(providers))}</p>
-<p class="muted">{t['home_about'].format(d=e((self.sq.get('generated_at') or '')[:10]))}</p>
-<p class="muted">{t['home_submit'].format(u='submit.html')}</p></div>
-<a class="example" href="m/{e(ex['slug'])}.html"><span class="ex-h">{t['ex_h'].format(n=len(ex['offers']))}</span>
-<span class="ex-model">{avatar(ex.get('vendor') or ex['name'], ex.get('vendor') or ex['offers'][0]['provider'])}<b translate="no">{e(ex['name'])}</b></span>
-<ul>{ex_rows}</ul><span class="ex-more">{t['ex_more']}</span></a></section>"""
+<p class="hero-cta"><a class="btn primary" href="models.html">{t['home_cta']}</a><span class="muted small">{t['home_fresh'].format(d=e((self.sq.get('generated_at') or '')[:10]))}</span></p>
+<p class="muted">{t['home_app'].format(u='download.html')}</p></div>
+{self.tracker(models)}</section>"""
         self.write("index.html", t["home_title"], hero + self.home_sections(), t["home_desc"], "home")
         hero = f"""<section class="hero"><h1>{t['sq_h1']}</h1>
 <p class="lead">{t['sq_lead'].format(m=len(models), p=len(used), x=multi)}</p>
