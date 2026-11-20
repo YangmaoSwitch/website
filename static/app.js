@@ -5,6 +5,22 @@
     var mq = document.getElementById("mq"), macc = document.getElementById("macc"), mprov = document.getElementById("mprov"),
       mcount = document.getElementById("mcount"), seg = document.getElementById("mcap"), cap = "";
     var mcards = Array.prototype.slice.call(mgrid.querySelectorAll(".mcard"));
+    // filters live in the URL so a filtered view can be shared and survives back/forward
+    var params = new URLSearchParams(location.search);
+    mq.value = params.get("q") || "";
+    macc.value = params.get("access") || "";
+    mprov.value = params.get("platform") || "";
+    cap = params.get("cap") || "";
+    seg.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x.dataset.v === cap ? "true" : "false"); });
+    var sync = function () {
+      var p = new URLSearchParams();
+      if (mq.value.trim()) p.set("q", mq.value.trim());
+      if (cap) p.set("cap", cap);
+      if (macc.value) p.set("access", macc.value);
+      if (mprov.value) p.set("platform", mprov.value);
+      var qs = p.toString();
+      history.replaceState(null, "", location.pathname + (qs ? "?" + qs : ""));
+    };
     var mapply = function () {
       var text = mq.value.trim().toLowerCase(), shown = 0;
       mcards.forEach(function (c) {
@@ -17,6 +33,7 @@
         if (ok) shown++;
       });
       mcount.textContent = mcount.dataset.tpl.replace("{n}", shown);
+      sync();
     };
     seg.addEventListener("click", function (ev) {
       var b = ev.target.closest("button");

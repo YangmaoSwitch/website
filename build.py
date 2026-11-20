@@ -61,7 +61,8 @@ T = {
         "sq_lead": "收录 <b>{m}</b> 个可以免费调用的模型，以及提供它们的 <b>{p}</b> 个平台；其中 {x} 个模型在多个平台都能用。点开模型可以看到每个平台的调用方式、免费额度和标价。",
         "sq_about": "羊毛switch 是开源的密钥管理和用量管理桌面应用：在本机保存各平台的密钥，按免费额度记账和限量。",
         "updated": "数据更新于 {d}，尽量保持最新且完整，欢迎用户和平台方<a href=\"{u}\">提交</a>，我们核实后上架。",
-        "search_model": "搜索模型名称", "all": "全部", "cap_vision": "视觉", "cap_tools": "工具调用", "cap_reasoning": "推理",
+        "search_model": "搜索模型名称…", "skip": "跳到正文", "lbl_cap": "能力", "lbl_acc": "调用方式", "lbl_prov": "平台", "lbl_region": "地区", "lbl_over": "超额处理",
+        "ex_h": "同一个模型，{n} 个平台", "ex_more": "查看全部平台", "lang_label": "切换到英文", "all": "全部", "cap_vision": "视觉", "cap_tools": "工具调用", "cap_reasoning": "推理",
         "acc_all": "全部方式", "acc_free": "只看免费模型", "acc_quota": "免费或用免费额度", "all_platforms": "全部平台", "showing": "显示 {n} 个",
         # model page
         "m_title": "{name} 在哪些平台可以免费调用 - 羊毛switch", "m_desc": "{name}：{n} 个平台的调用方式、免费额度和标价。",
@@ -77,7 +78,7 @@ T = {
         "p_title": "平台 - 羊毛switch", "p_desc": "各平台大模型免费 API 额度，附官方依据。", "p_h1": "平台",
         "p_lead": "收录 {n} 个提供免费额度的平台（其中 {a} 个能当 API 用），每条额度都附官方依据。",
         "p_updated": "目录更新于 {d} · 欢迎<a href=\"{j}\">平台方</a>和用户<a href=\"{u}\">提交</a>，我们核实后上架。",
-        "search_p": "搜索平台、标签", "all_regions": "全部地区", "r_cn": "国内", "r_global": "海外", "ov_any": "超额处理不限", "ov_blocked": "只看用完即停",
+        "search_p": "搜索平台、标签…", "all_regions": "全部地区", "r_cn": "国内", "r_global": "海外", "ov_any": "超额处理不限", "ov_blocked": "只看用完即停",
         "api_only": "只看能当 API 用的", "l3_only": "只看能一键开通的",
         "pp_title": "{name} 免费额度与模型 - 羊毛switch", "quota_h": "免费额度", "models_h": "模型", "basic_h": "基本信息", "terms_h": "条款要点",
         "no_models": "暂无模型列表，欢迎<a href=\"{u}\">提交</a>。", "models_sum": "共 {t} 个：免费 {f} · 用免费额度 {q} · 付费 {p}。",
@@ -145,7 +146,8 @@ T = {
         "sq_lead": "<b>{m}</b> models you can call for free, served by <b>{p}</b> platforms; {x} of them are available on more than one. Open a model to see each platform's access, free quota and list price.",
         "sq_about": "YangmaoSwitch is an open-source desktop app for managing your API keys and usage: keys stay on your computer, and calls are metered and capped against each free quota.",
         "updated": "Data updated {d}. We aim to keep it current and complete; users and platforms are welcome to <a href=\"{u}\">submit</a> entries, which we verify before listing.",
-        "search_model": "Search models", "all": "All", "cap_vision": "Vision", "cap_tools": "Tools", "cap_reasoning": "Reasoning",
+        "search_model": "Search models…", "skip": "Skip to content", "lbl_cap": "Capability", "lbl_acc": "Access", "lbl_prov": "Platform", "lbl_region": "Region", "lbl_over": "Overage policy",
+        "ex_h": "One model, {n} platforms", "ex_more": "See all platforms", "lang_label": "Switch to Chinese", "all": "All", "cap_vision": "Vision", "cap_tools": "Tools", "cap_reasoning": "Reasoning",
         "acc_all": "Any access", "acc_free": "Free models only", "acc_quota": "Free or free quota", "all_platforms": "All platforms", "showing": "Showing {n}",
         "m_title": "Where to call {name} for free - YangmaoSwitch", "m_desc": "{name}: access, free quota and list price on {n} platforms.",
         "ctx": "Context", "input": "Input", "released": "Released", "weights": "Weights", "ctx_tokens": "{n} tokens",
@@ -156,7 +158,7 @@ T = {
         "p_title": "Providers - YangmaoSwitch", "p_desc": "Free API quotas of LLM platforms, each with an official source.", "p_h1": "Providers",
         "p_lead": "{n} platforms with free quotas ({a} usable as an API), each quota with an official source.",
         "p_updated": "Catalog updated {d} · <a href=\"{j}\">Platforms</a> and users are welcome to <a href=\"{u}\">submit</a> entries, which we verify before listing.",
-        "search_p": "Search platforms and tags", "all_regions": "All regions", "r_cn": "China", "r_global": "Global", "ov_any": "Any overage policy", "ov_blocked": "Stops when used up",
+        "search_p": "Search platforms and tags…", "all_regions": "All regions", "r_cn": "China", "r_global": "Global", "ov_any": "Any overage policy", "ov_blocked": "Stops when used up",
         "api_only": "Usable as an API", "l3_only": "One-click sign-up",
         "pp_title": "{name} free quota and models - YangmaoSwitch", "quota_h": "Free quota", "models_h": "Models", "basic_h": "Details", "terms_h": "Terms to note",
         "no_models": "No model list yet; feel free to <a href=\"{u}\">submit</a> one.", "models_sum": "{t} models: {f} free · {q} on free quota · {p} paid.",
@@ -310,15 +312,21 @@ class Site:
         doc = f"""<!doctype html>
 <html lang="{self.t['html_lang']}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)}</title><meta name="description" content="{e(desc)}">
-<link rel="alternate" hreflang="zh-CN" href="{alt_zh}"><link rel="alternate" hreflang="en" href="{alt_en}">
+<link rel="canonical" href="{alt_zh if self.L == 'zh' else alt_en}">
+<link rel="alternate" hreflang="zh-CN" href="{alt_zh}"><link rel="alternate" hreflang="en" href="{alt_en}"><link rel="alternate" hreflang="x-default" href="{alt_zh}">
+<meta property="og:type" content="website"><meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}">
+<meta property="og:url" content="{alt_zh if self.L == 'zh' else alt_en}"><meta property="og:image" content="{SITE}icon.png"><meta property="og:site_name" content="{self.t['brand_text']}">
+<meta name="theme-color" content="#fafafa">
+<link rel="preload" href="{root}fonts/geist-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{root}style.css"><link rel="icon" href="{root}icon.png">
 <link rel="alternate" type="application/feed+json" href="{home}feed.json">
 </head><body>
-<header><div class="bar"><a class="brand" href="{home}index.html"><img src="{root}icon.png" alt="" width="26" height="26">{self.t['brand']}</a>
+<a class="skip" href="#main">{self.t['skip']}</a>
+<header><div class="bar"><a class="brand" href="{home}index.html" translate="no"><img src="{root}icon.png" alt="" width="26" height="26">{self.t['brand']}</a>
 <nav>{navs}<a href="{REPO}">GitHub</a></nav>
-<a class="lang" href="{other}" hreflang="{other_lang}" lang="{other_lang}">{other_label}</a>
+<a class="lang" href="{other}" hreflang="{other_lang}" lang="{other_lang}" aria-label="{self.t['lang_label']}">{other_label}</a>
 <a class="btn primary small" href="{home}download.html">{self.t['get_app']}</a></div></header>
-<main>{body}</main>
+<main id="main">{body}</main>
 <footer><p>{self.t['footer']}
 <a href="{REPO}/catalog/issues/new/choose">{self.t['submit']}</a> · {self.t['contact']} <a href="mailto:{EMAIL}">{EMAIL}</a></p></footer>
 <script src="{root}app.js"></script></body></html>"""
@@ -377,7 +385,7 @@ class Site:
         tone = {"free": "ok", "quota": "blue", "paid": ""}[best]
         tag_html = f'<span class="mtag {tone}">{t["access"][best]}</span>' + "".join(f'<span class="mtag">{e(x)}</span>' for x in self.tags(m))
         return f"""<a class="mcard" href="m/{e(m['slug'])}.html" data-search="{e(search.lower())}" data-caps="{' '.join(caps)}" data-providers=" {' '.join(o['provider'] for o in offers)} " data-access="{best}">
-<div class="mcard-head">{avatar(m.get('vendor') or m['name'], m.get('vendor') or offers[0]['provider'])}<div><b>{e(title)}</b><span>{e(plats)}</span></div></div>
+<div class="mcard-head">{avatar(m.get('vendor') or m['name'], m.get('vendor') or offers[0]['provider'])}<div><b translate="no">{e(title)}</b><span>{e(plats)}</span></div></div>
 <p class="mdesc">{e(self.desc(m) or t['no_desc'])}</p>
 <div class="mtags">{tag_html}</div></a>"""
 
@@ -389,7 +397,7 @@ class Site:
             q = self.quota_text(p, self.pick_quota(p, o["access"])) if p and p.get("quotas") and o["access"] != "paid" else ""
             tone = {"free": "ok", "quota": "blue", "paid": ""}[o["access"]]
             rows.append(f"""<tr><td><a class="plat" href="../p/{e(o['provider'])}.html">{avatar(self.pname(o['provider']), o['provider'], 'av sm')}{e(self.pname(o['provider']))}</a></td>
-<td><code>{e(o['model'])}</code></td><td><span class="mtag {tone}">{t['access'][o['access']]}</span></td><td>{e(q) or '—'}</td><td class="num">{e(price_text(o.get('price'))) or '—'}</td></tr>""")
+<td><code translate="no">{e(o['model'])}</code></td><td><span class="mtag {tone}">{t['access'][o['access']]}</span></td><td>{e(q) or '—'}</td><td class="num">{e(price_text(o.get('price'))) or '—'}</td></tr>""")
         facts = []
         if m.get("context_length"):
             facts.append((t["ctx"], t["ctx_tokens"].format(n=f"{m['context_length']:,}")))
@@ -401,7 +409,7 @@ class Site:
         d = self.desc(m)
         tag_html = "".join(f'<span class="mtag">{e(x)}</span>' for x in self.tags(m))
         body = f"""<p class="crumb"><a href="../index.html">{t['nav']['models']}</a> / {e(m['name'])}</p>
-<div class="mhead">{avatar(m.get('vendor') or m['name'], m.get('vendor') or m['offers'][0]['provider'], 'av lg')}<div><h1>{e(m['name'])}</h1><p class="muted">{e(m.get('vendor') or '')}</p></div></div>
+<div class="mhead">{avatar(m.get('vendor') or m['name'], m.get('vendor') or m['offers'][0]['provider'], 'av lg')}<div><h1 translate="no">{e(m['name'])}</h1><p class="muted">{e(m.get('vendor') or '')}</p></div></div>
 {f'<p class="lead">{e(d)}</p>' if d else ''}
 <div class="mtags">{tag_html}</div>
 <table class="kv">{''.join(f'<tr><th>{k}</th><td>{v}</td></tr>' for k, v in facts)}</table>
@@ -444,8 +452,8 @@ class Site:
             (t["k_platform"], f'<a href="{e(p["homepage"])}" target="_blank" rel="noopener">{e(name)}</a>'),
             (t["k_region"], t["region"][p["region"]]),
             (t["k_api"], t["k_yes"] if p["api_usable"] else t["k_no"]),
-            (t["k_endpoint"], f'<code>{e(api["base_url"])}</code>（{e(t["k_protocol"].format(p=t["list"].join(t["proto"].get(x, x) for x in api["protocol"])))}）' if api and self.L == "zh" else
-             (f'<code>{e(api["base_url"])}</code> ({e(t["k_protocol"].format(p=t["list"].join(t["proto"].get(x, x) for x in api["protocol"])))})' if api else "—")),
+            (t["k_endpoint"], f'<code translate="no">{e(api["base_url"])}</code>（{e(t["k_protocol"].format(p=t["list"].join(t["proto"].get(x, x) for x in api["protocol"])))}）' if api and self.L == "zh" else
+             (f'<code translate="no">{e(api["base_url"])}</code> ({e(t["k_protocol"].format(p=t["list"].join(t["proto"].get(x, x) for x in api["protocol"])))})' if api else "—")),
             (t["k_requires"], e(t["list"].join(t["requires"].get(r, r) for r in p["signup"].get("requires", [])) or "—")),
             (t["k_blocked"], e(t["list"].join(p["signup"].get("regions_blocked", []))) or "—"),
             (t["k_overage"], t["overage"][p["overage"]]),
@@ -473,7 +481,7 @@ class Site:
                     continue
 
                 def cell(x):
-                    code = f'<code>{e(x["model"])}</code>'
+                    code = f'<code translate="no">{e(x["model"])}</code>'
                     return f'<a href="../m/{e(self.slug_of[x["model"]])}.html">{code}</a>' if x["model"] in self.slug_of else code
                 li = "".join(f'<tr><td>{cell(x)}</td><td class="num">{e(price_text(x.get("price"))) or "—"}</td></tr>' for x in lst)
                 groups.append(f'<details{" open" if acc != "paid" else ""}><summary>{t["group"][acc]} <span class="muted">{len(lst)}</span></summary>'
@@ -499,15 +507,23 @@ class Site:
 
         used = sorted({o["provider"] for m in models for o in m["offers"]}, key=lambda x: self.pname(x).lower())
         multi = sum(len(m["offers"]) > 1 for m in models)
-        hero = f"""<section class="hero"><h1>{t['sq_h1']}</h1>
+        ex = max(models, key=lambda m: (sum(o["access"] != "paid" for o in m["offers"]), len(m["offers"])))
+        ex_rows = "".join(
+            f'<li><span class="plat">{avatar(self.pname(o["provider"]), o["provider"], "av sm")}{e(self.pname(o["provider"]))}</span>'
+            f'<span class="mtag {dict(free="ok", quota="blue", paid="")[o["access"]]}">{t["access"][o["access"]]}</span></li>' for o in ex["offers"][:6])
+        hero = f"""<section class="hero split"><div>
+<h1>{t['sq_h1']}</h1>
 <p class="lead">{t['sq_lead'].format(m=len(models), p=len(used), x=multi)}</p>
-<p class="muted">{t['sq_about']} {t['updated'].format(d=e((self.sq.get('generated_at') or '')[:10]), u=issues)}</p></section>"""
+<p class="muted">{t['sq_about']} {t['updated'].format(d=e((self.sq.get('generated_at') or '')[:10]), u=issues)}</p></div>
+<a class="example" href="m/{e(ex['slug'])}.html"><span class="ex-h">{t['ex_h'].format(n=len(ex['offers']))}</span>
+<span class="ex-model">{avatar(ex.get('vendor') or ex['name'], ex.get('vendor') or ex['offers'][0]['provider'])}<b translate="no">{e(ex['name'])}</b></span>
+<ul>{ex_rows}</ul><span class="ex-more">{t['ex_more']}</span></a></section>"""
         filters = f"""<div class="toolbar">
-<input id="mq" placeholder="{t['search_model']}">
-<div class="seg" id="mcap"><button data-v="" aria-pressed="true">{t['all']}</button><button data-v="vision">{t['cap_vision']}</button><button data-v="tools">{t['cap_tools']}</button><button data-v="reasoning">{t['cap_reasoning']}</button></div>
-<select id="macc"><option value="">{t['acc_all']}</option><option value="free">{t['acc_free']}</option><option value="quota">{t['acc_quota']}</option></select>
-<select id="mprov"><option value="">{t['all_platforms']}</option>{''.join(f'<option value="{e(x)}">{e(self.pname(x))}</option>' for x in used)}</select>
-<span id="mcount" class="muted" data-tpl="{e(t['showing'])}"></span></div>"""
+<input id="mq" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="{t['search_model']}" aria-label="{t['search_model'].rstrip('…')}">
+<div class="seg" id="mcap" role="group" aria-label="{t['lbl_cap']}"><button data-v="" aria-pressed="true">{t['all']}</button><button data-v="vision">{t['cap_vision']}</button><button data-v="tools">{t['cap_tools']}</button><button data-v="reasoning">{t['cap_reasoning']}</button></div>
+<select id="macc" name="access" aria-label="{t['lbl_acc']}"><option value="">{t['acc_all']}</option><option value="free">{t['acc_free']}</option><option value="quota">{t['acc_quota']}</option></select>
+<select id="mprov" name="platform" aria-label="{t['lbl_prov']}"><option value="">{t['all_platforms']}</option>{''.join(f'<option value="{e(x)}">{e(self.pname(x))}</option>' for x in used)}</select>
+<span id="mcount" class="muted" aria-live="polite" data-tpl="{e(t['showing'])}"></span></div>"""
         grid = '<section class="mgrid" id="mgrid">' + "".join(self.model_card(m) for m in models) + "</section>"
         self.write("index.html", t["sq_title"], hero + filters + grid, t["sq_desc"], "models")
         for m in models:
@@ -518,12 +534,12 @@ class Site:
 <p class="lead">{t['p_lead'].format(n=len(providers), a=api_n)}</p>
 <p class="muted">{t['p_updated'].format(d=e((self.cat.get('generated_at') or '')[:10]), j='providers-join.html', u=issues)}</p></section>"""
         pfilters = f"""<div class="toolbar">
-<input id="q" placeholder="{t['search_p']}">
-<select id="region"><option value="">{t['all_regions']}</option><option value="cn">{t['r_cn']}</option><option value="global">{t['r_global']}</option></select>
-<select id="overage"><option value="">{t['ov_any']}</option><option value="blocked">{t['ov_blocked']}</option></select>
+<input id="q" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="{t['search_p']}" aria-label="{t['search_p'].rstrip('…')}">
+<select id="region" name="region" aria-label="{t['lbl_region']}"><option value="">{t['all_regions']}</option><option value="cn">{t['r_cn']}</option><option value="global">{t['r_global']}</option></select>
+<select id="overage" name="overage" aria-label="{t['lbl_over']}"><option value="">{t['ov_any']}</option><option value="blocked">{t['ov_blocked']}</option></select>
 <label><input type="checkbox" id="api" checked> {t['api_only']}</label>
 <label><input type="checkbox" id="l3"> {t['l3_only']}</label>
-<span id="count" class="muted" data-tpl="{e(t['showing'])}"></span></div>"""
+<span id="count" class="muted" aria-live="polite" data-tpl="{e(t['showing'])}"></span></div>"""
         pgrid = '<section class="grid" id="grid">' + "".join(self.provider_card(p) for p in providers) + "</section>"
         self.write("providers.html", t["p_title"], phero + pfilters + pgrid, t["p_desc"], "providers")
         for p in providers:
@@ -537,7 +553,7 @@ class Site:
         elif dl_items:
             dl = '<ul class="files">' + "".join(
                 f'<li><a class="btn primary" href="{root}download/{e(f["name"])}">{t["d_win"].format(s=f"{f["size"] / 1048576:.1f}")}</a>'
-                f'<span class="muted small">{e(f["name"])} · SHA-256 <code>{f["sha"]}</code></span></li>' for f in dl_items) + f'</ul><p class="muted small">{t["d_note"]}</p>'
+                f'<span class="muted small">{e(f["name"])} · SHA-256 <code translate="no">{f["sha"]}</code></span></li>' for f in dl_items) + f'</ul><p class="muted small">{t["d_note"]}</p>'
         else:
             dl = f'<p class="muted">{t["d_none"]}</p>'
         download = f"""<h1>{t['d_h1']}</h1><p class="lead">{t['d_lead']}</p>{dl}
@@ -592,6 +608,7 @@ def main() -> None:
     (OUT / "download").mkdir(parents=True)
     for f in ("style.css", "app.js", "icon.png"):
         shutil.copy(ROOT / "static" / f, OUT / f)
+    shutil.copytree(ROOT / "static" / "fonts", OUT / "fonts")
     dl_items = []
     for f in sorted((ROOT / "static" / "download").glob("*.exe")) if (ROOT / "static" / "download").exists() else []:
         shutil.copy(f, OUT / "download" / f.name)
@@ -602,6 +619,10 @@ def main() -> None:
         Site(lang, cat, sq, providers, models, slug_of).build(dl_items, release)
     (OUT / "catalog.json").write_text(json.dumps(cat, ensure_ascii=False), encoding="utf-8")
     (OUT / "models.json").write_text(json.dumps(sq, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    pages = sorted(str(f.relative_to(OUT)).replace("\\", "/") for f in OUT.rglob("*.html"))
+    urls = "".join(f"<url><loc>{SITE}{u}</loc></url>" for u in pages)
+    (OUT / "sitemap.xml").write_text(f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>', encoding="utf-8")
+    (OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE}sitemap.xml\n", encoding="utf-8")
     (OUT / ".nojekyll").write_text("", encoding="utf-8")
     print(f"ok: {len(models)} models, {len(providers)} providers, zh + en -> {OUT}")
 
