@@ -28,6 +28,12 @@ REPO = "https://github.com/YangmaoSwitch"
 EMAIL = os.environ.get("YM_CONTACT_EMAIL", "")  # contact address on the own domain; not shown until set
 API_BASE = os.environ.get("YM_API_BASE", "").rstrip("/")  # account service; empty until it is deployed
 RANK = {"free": 0, "quota": 1, "paid": 2}
+# Header icons (Lucide, ISC licence; GitHub mark)
+_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+ICON_LANG = _SVG + '<path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>'
+ICON_SUBMIT = _SVG + '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M12 7v6"/><path d="M9 10h6"/></svg>'
+ICON_DOWNLOAD = _SVG + '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>'
+ICON_GITHUB = ('<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.6 18.3 5 18.3 5c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>')
 COLORS = ["#c2410c", "#1d4ed8", "#047857", "#6d28d9", "#b91c1c", "#0369a1", "#a16207", "#0f766e", "#be185d", "#4338ca"]
 
 e = html.escape
@@ -36,38 +42,39 @@ e = html.escape
 T = {
     "zh": {
         "brand": '<span class="name">羊毛<span>switch</span></span>', "brand_text": "羊毛switch", "html_lang": "zh-CN", "other": ("en", "English"),
-        "nav": {"home": "首页", "models": "模型广场", "providers": "平台", "download": "下载", "join": "平台入驻"}, "get_app": "下载桌面端", "submit_btn": "提交 / 纠错",
+        "nav": {"home": "首页", "models": "模型广场", "providers": "供应商", "download": "下载", "join": "供应商入驻"}, "get_app": "下载桌面端", "submit_btn": "提交 / 纠错",
         "home_title": "羊毛switch - 免费大模型 API 目录", "home_h1": "免费大模型 API 目录",
-        "home_dl_note": "目前只有 Windows 版",
+        "home_dl_note": "桌面应用目前只有 Windows 版",
         "home_dl": "下载桌面应用",
-        "home_desc": "收录各平台可以免费调用的大模型，标明免费模型、赠送额度和付费，每条额度链接到平台原文。配套开源桌面应用在本机管理密钥和用量。",
+        "home_desc": "收录各供应商可以免费调用的大模型，标明免费模型、赠送额度和付费，每条额度链接到供应商原文。配套开源桌面应用在本机管理密钥和用量。",
         "home_cta": "浏览 {m} 个模型", "home_fresh": "每 6 小时刷新，最近一次 {d}",
-        "home_app": "桌面应用把各平台的密钥存在系统钥匙串里，给 Cline、Cherry Studio 等工具提供一个本机地址，把请求转给还有额度的账号，用到 90% 就停。",
-        "home_submit": "目录尽量保持最新、完整。发现遗漏或错误，欢迎用户和平台方<a href=\"{u}\">提交</a>，我们核实后上架。",
-        "tracker_cap": "热度前 {n} 的模型在各平台的提供方式", "not_offered": "不提供",
-        "home_lead": "收录 <b>{p}</b> 个平台、<b>{m}</b> 个可以免费调用的模型。每条额度都链接到平台原文，数据每 6 小时刷新一次。",
-        "sec_hot": "热门免费模型", "sec_hot_sub": "按 OpenRouter 每日用量和提供平台数排序",
+        "home_app": "桌面应用把各供应商的密钥存在系统钥匙串里，给 Cline、Cherry Studio 等工具提供一个本机地址，把请求转给还有额度的账号，用到 90% 就停。",
+        "home_submit": "目录尽量保持最新、完整。发现遗漏或错误，欢迎用户和供应商<a href=\"{u}\">提交</a>，我们核实后上架。",
+        "tracker_cap": "热度前 {n} 的模型在各供应商的提供方式", "not_offered": "不提供",
+        "home_lead": "收录 <b>{p}</b> 个供应商、<b>{m}</b> 个可以免费调用的模型。每条额度都链接到供应商原文，数据每 6 小时刷新一次。",
+        "sec_hot": "热门免费模型", "sec_hot_sub": "按 OpenRouter 每日用量和提供它的供应商数排序",
+        "sec_prov": "热门供应商", "sec_prov_sub": "按提供的热门免费模型排序",
         "sec_newfree": "新上免费用量", "sec_newfree_sub": "最近 14 天新出现的免费模型或免费额度",
         "sec_newfree_empty": "最近 14 天没有新上的免费用量。数据每 6 小时更新一次。",
         "sec_new": "新模型", "sec_new_sub": "最近 45 天上线、可以免费调用的模型",
-        "sec_forever": "不限期免费", "sec_forever_sub": "平台列为免费模型、不消耗额度（通常有限速），以平台公布为准",
+        "sec_forever": "不限期免费", "sec_forever_sub": "供应商列为免费模型、不消耗额度（通常有限速），以供应商公布为准",
         "sec_more": "查看全部", "since": "{d} 起",
-        "sort_lbl": "排序", "sort_heat": "按热度", "sort_new": "最新上线", "sort_platforms": "平台最多",
+        "sort_lbl": "排序", "sort_heat": "按热度", "sort_new": "最新上线", "sort_platforms": "供应商最多",
         "fix_btn": "纠错",
-        "sub": {"title": "提交 / 纠错", "lead": "提交新平台、新模型，或指出目录里的错误。登录后提交，我们核实后上架或更正，并在“我的提交”里回复处理结果。",
+        "sub": {"title": "提交 / 纠错", "lead": "提交新供应商、新模型，或指出目录里的错误。登录后提交，我们核实后上架或更正，并在“我的提交”里回复处理结果。",
                 "not_ready": "账号系统还在准备中，暂时可以在 GitHub 上提交（需要 GitHub 账号）。", "gh": "在 GitHub 上提交",
                 "email": "邮箱", "email_ph": "you@example.com", "send": "发送验证码", "resend": "{n} 秒后可重发", "code": "验证码", "code_ph": "6 位数字",
                 "login": "登录", "or": "或", "github": "用 GitHub 登录", "signed_in": "已登录：{who}", "logout": "退出登录",
-                "kind": "类型", "kinds": {"correction": "纠错", "new_provider": "新平台", "new_model": "新模型或新额度", "other": "其他"},
-                "target": "对象（平台或模型）", "target_ph": "例如 siliconflow 或 deepseek/deepseek-v4.1-flash", "stitle": "标题", "stitle_ph": "一句话说明",
+                "kind": "类型", "kinds": {"correction": "纠错", "new_provider": "新供应商", "new_model": "新模型或新额度", "other": "其他"},
+                "target": "对象（供应商或模型）", "target_ph": "例如 siliconflow 或 deepseek/deepseek-v4.1-flash", "stitle": "标题", "stitle_ph": "一句话说明",
                 "body": "详细说明", "body_ph": "额度、条件、哪里不对……", "evidence": "官方依据链接", "evidence_ph": "https://…", "submit": "提交",
                 "sent_ok": "已提交，感谢。处理结果会显示在下方“我的提交”里。", "mine": "我的提交", "none": "还没有提交。",
                 "status": {"open": "待处理", "accepted": "已采纳", "rejected": "未采纳", "done": "已上线"}, "note": "回复：",
                 "errors": {"bad_email": "邮箱格式不对。", "too_soon": "请稍后再获取验证码。", "rate_limited": "操作太频繁，请稍后再试。", "mail_failed": "邮件发送失败，请稍后再试。",
                            "code_expired": "验证码已失效，请重新获取。", "code_wrong": "验证码不对。", "not_signed_in": "请先登录。", "banned": "这个账号已不能提交。",
                            "network": "连不上服务器，请稍后再试。", "invalid": "请检查填写的内容。"}},
-        "footer": "额度和价格以各平台官方公布为准。羊毛switch 是开源项目（MIT 许可证），与所列平台无隶属关系。",
-        "submit": "提交新平台或纠错", "contact": "联系",
+        "footer": "额度和价格以各供应商官方公布为准。羊毛switch 是开源项目（MIT 许可证），与所列供应商无隶属关系。",
+        "submit": "提交新供应商或纠错", "contact": "联系",
         "unit": {"requests": "次", "tokens": "Token", "input_tokens": "输入 Token", "output_tokens": "输出 Token", "credits": "额度",
                  "points": "积分", "neurons": "Neurons", "usd": "美元", "cny": "元"},
         "period": {"second": "每秒", "minute": "每分钟", "hour": "每小时", "day": "每天", "week": "每周", "month": "每月", "one-time": "一次性"},
@@ -81,109 +88,110 @@ T = {
         "tag": {"vision": "视觉", "video": "视频理解", "audio": "音频", "tools": "工具调用", "reasoning": "推理模型", "open": "开源权重"},
         "tz": {"UTC": "UTC 时间", "Asia/Shanghai": "北京时间", "America/Los_Angeles": "太平洋时间"},
         "proto": {"openai": "OpenAI 兼容", "anthropic": "Anthropic", "gemini": "Gemini", "other": "其他"},
-        "limit_unknown": "{period}有上限（按{unit}计，数值见平台页面）", "reset": "{tz} {t} 重置", "expires": "{n} 天有效", "sep": " · ", "list": "、",
-        "more_platforms": "{names} 等 {n} 个平台", "no_desc": "暂无介绍。", "region": {"cn": "国内", "global": "海外"},
+        "limit_unknown": "{period}有上限（按{unit}计，数值见供应商页面）", "reset": "{tz} {t} 重置", "expires": "{n} 天有效", "sep": " · ", "list": "、",
+        "more_platforms": "{names} 等 {n} 个供应商", "no_desc": "暂无介绍。", "region": {"cn": "国内", "global": "海外"},
         "to_verify": "待核实", "one_click": "一键开通", "signup": "注册：", "overage_l": "超额：",
         "models_count": "模型 {t} 个（免费 {f} · 用免费额度 {q}）", "go_signup": "去注册", "details": "详情", "verified": "最后核实 {d}",
         "create_key": "创建密钥", "evidence": "官方依据",
-        "auto_paid_warn": "注意：这个平台的免费额度用完后会自动转为付费。请先在平台控制台开启“用完即停”之类的保护设置。",
+        "auto_paid_warn": "注意：这个供应商的免费额度用完后会自动转为付费。请先在供应商控制台开启“用完即停”之类的保护设置。",
         # model square
         "sq_title": "羊毛switch - 模型广场：哪些大模型可以免费调用",
-        "sq_desc": "汇总各平台可以免费调用的大模型，列出每个平台的调用方式、免费额度和标价。开源的密钥与用量管理桌面应用。",
+        "sq_desc": "汇总各供应商可以免费调用的大模型，列出每个供应商的调用方式、免费额度和标价。开源的密钥与用量管理桌面应用。",
         "sq_h1": "模型广场",
-        "sq_lead": "收录 <b>{m}</b> 个可以免费调用的模型，以及提供它们的 <b>{p}</b> 个平台；其中 {x} 个模型在多个平台都能用。点开模型可以看到每个平台的调用方式、免费额度和标价。",
-        "sq_about": "羊毛switch 是开源的密钥管理和用量管理桌面应用：在本机保存各平台的密钥，按免费额度记账和限量。",
-        "updated": "数据更新于 {d}，尽量保持最新且完整，欢迎用户和平台方<a href=\"{u}\">提交</a>，我们核实后上架。",
-        "search_model": "搜索模型名称…", "skip": "跳到正文", "lbl_cap": "能力", "lbl_acc": "调用方式", "lbl_prov": "平台", "lbl_region": "地区", "lbl_over": "超额处理",
-        "ex_h": "同一个模型，{n} 个平台", "ex_more": "查看全部平台", "lang_label": "切换到英文", "all": "全部", "cap_vision": "视觉", "cap_tools": "工具调用", "cap_reasoning": "推理",
-        "acc_all": "全部方式", "acc_free": "只看免费模型", "acc_quota": "免费或用免费额度", "all_platforms": "全部平台", "showing": "显示 {n} 个",
+        "sq_lead": "收录 <b>{m}</b> 个可以免费调用的模型，以及提供它们的 <b>{p}</b> 个供应商；其中 {x} 个模型在多个供应商都能用。点开模型可以看到每个供应商的调用方式、免费额度和标价。",
+        "sq_about": "羊毛switch 是开源的密钥管理和用量管理桌面应用：在本机保存各供应商的密钥，按免费额度记账和限量。",
+        "updated": "数据更新于 {d}，尽量保持最新且完整，欢迎用户和供应商<a href=\"{u}\">提交</a>，我们核实后上架。",
+        "search_model": "搜索模型名称…", "skip": "跳到正文", "lbl_cap": "能力", "lbl_acc": "调用方式", "lbl_prov": "供应商", "lbl_region": "地区", "lbl_over": "超额处理",
+        "ex_h": "同一个模型，{n} 个供应商", "ex_more": "查看全部供应商", "lang_label": "切换到英文", "all": "全部", "cap_vision": "视觉", "cap_tools": "工具调用", "cap_reasoning": "推理",
+        "acc_all": "全部方式", "acc_free": "只看免费模型", "acc_quota": "免费或用免费额度", "all_platforms": "全部供应商", "showing": "显示 {n} 个",
         # model page
-        "m_title": "{name} 在哪些平台可以免费调用 - 羊毛switch", "m_desc": "{name}：{n} 个平台的调用方式、免费额度和标价。",
+        "m_title": "{name} 在哪些供应商可以免费调用 - 羊毛switch", "m_desc": "{name}：{n} 个供应商的调用方式、免费额度和标价。",
         "ctx": "上下文", "input": "输入", "released": "上线时间", "weights": "开源权重", "ctx_tokens": "{n} Token",
-        "platforms_h": "提供这个模型的平台", "th_platform": "平台", "th_model": "模型名", "th_access": "方式", "th_quota": "免费额度",
+        "platforms_h": "提供这个模型的供应商", "th_platform": "供应商", "th_model": "模型名", "th_access": "方式", "th_quota": "免费额度",
         "th_price": "标价（每百万输入 / 输出 Token，美元）",
-        "m_note": "“用免费额度”指调用会消耗平台送的免费额度或代金券。标价为平台公开的美元价格，仅供参考；“—”表示没有公开标价。",
+        "m_note": "“用免费额度”指调用会消耗供应商送的免费额度或代金券。标价为供应商公开的美元价格，仅供参考；“—”表示没有公开标价。",
         "price_free": "免费",
-        "m_cta": "用 <a href=\"{u}\">羊毛switch 桌面端</a> 添加这些平台的密钥后，本机入口会按模型名自动选用有额度的账号。",
+        "m_cta": "用 <a href=\"{u}\">羊毛switch 桌面端</a> 添加这些供应商的密钥后，本机入口会按模型名自动选用有额度的账号。",
         # generated description
         "gd_vendor": "{v} 的", "gd_open": "开源", "gd_model": "模型。", "gd_ctx": "上下文 {c}", "gd_input": "可输入{m}", "gd_tools": "支持工具调用",
-        "gd_reason": "支持推理（思考）模式", "gd_avail": "目前可在 {n} 个平台调用，其中 {k} 个可以免费或用免费额度调用。", "gd_join": "，", "gd_end": "。",
+        "gd_reason": "支持推理（思考）模式", "gd_avail": "目前可在 {n} 个供应商调用，其中 {k} 个可以免费或用免费额度调用。", "gd_join": "，", "gd_end": "。",
         # providers
-        "p_title": "平台 - 羊毛switch", "p_desc": "各平台大模型免费 API 额度，附官方依据。", "p_h1": "平台",
-        "p_lead": "收录 {n} 个提供免费额度的平台（其中 {a} 个能当 API 用），每条额度都附官方依据。",
-        "p_updated": "目录更新于 {d} · 欢迎<a href=\"{j}\">平台方</a>和用户<a href=\"{u}\">提交</a>，我们核实后上架。",
-        "search_p": "搜索平台、标签…", "all_regions": "全部地区", "r_cn": "国内", "r_global": "海外", "ov_any": "超额处理不限", "ov_blocked": "只看用完即停",
+        "p_title": "供应商 - 羊毛switch", "p_desc": "各供应商大模型免费 API 额度，附官方依据。", "p_h1": "供应商",
+        "p_lead": "收录 {n} 个提供免费额度的供应商（其中 {a} 个能当 API 用），每条额度都附官方依据。",
+        "p_updated": "目录更新于 {d} · 欢迎用户和供应商<a href=\"{u}\">提交</a>，我们核实后上架。",
+        "search_p": "搜索供应商、标签…", "all_regions": "全部地区", "r_cn": "国内", "r_global": "海外", "ov_any": "超额处理不限", "ov_blocked": "只看用完即停",
         "api_only": "只看能当 API 用的", "l3_only": "只看能一键开通的",
         "pp_title": "{name} 免费额度与模型 - 羊毛switch", "quota_h": "免费额度", "models_h": "模型", "basic_h": "基本信息", "terms_h": "条款要点",
         "no_models": "暂无模型列表，欢迎<a href=\"{u}\">提交</a>。", "models_sum": "共 {t} 个：免费 {f} · 用免费额度 {q} · 付费 {p}。",
-        "k_platform": "平台", "k_region": "地区", "k_api": "能否当 API 用", "k_yes": "能", "k_no": "不能，只能在平台自己的产品里用", "k_endpoint": "接口",
+        "k_platform": "供应商", "k_region": "地区", "k_api": "能否当 API 用", "k_yes": "能", "k_no": "不能，只能在供应商自己的产品里用", "k_endpoint": "接口",
         "k_protocol": "{p} 协议", "k_requires": "注册要求", "k_blocked": "不支持地区", "k_overage": "额度用完后", "k_level": "开通方式",
         "k_verified": "最后核实", "k_notes": "说明",
-        "p_cta": "用 <a href=\"{u}\">羊毛switch 桌面端</a> 添加这个平台的密钥后，可以在本机按上面的额度记账和限量。",
+        "p_cta": "用 <a href=\"{u}\">羊毛switch 桌面端</a> 添加这个供应商的密钥后，可以在本机按上面的额度记账和限量。",
         # download
         "d_title": "下载 - 羊毛switch", "d_desc": "下载羊毛switch 桌面端（Windows）", "d_h1": "下载羊毛switch 桌面端",
-        "d_lead": "在本机管理各平台的密钥和用量：查看哪些模型可以免费调用、开通账号、按免费额度记账和限量。",
+        "d_lead": "在本机管理各供应商的密钥和用量：查看哪些模型可以免费调用、开通账号、按免费额度记账和限量。",
         "d_release": "最新版本 <b>{t}</b>，发布于 {d}。", "d_win": "下载 Windows 版（{s} MB）",
         "d_note": "目前只提供 Windows 10/11 x64 版本；macOS 和 Linux 版本之后提供。安装包暂未做代码签名，Windows 可能提示“未知发布者”，可在提示里选择“仍要运行”。",
         "d_none": "暂无正式版本。可以从源代码构建。", "d_src": "源代码", "d_issues": "反馈问题",
         "d_sec_h": "安全说明", "d_sec": ["你的密钥只保存在本机系统钥匙串（Windows 凭据管理器）。",
-                                     "羊毛switch 的服务器只提供公开的平台和模型目录，不接触你的密钥，也不转发任何模型调用。",
-                                     "本机入口只监听 127.0.0.1，并且需要本机密钥才能调用；请求用你自己的密钥直接发往平台。",
+                                     "羊毛switch 的服务器只提供公开的供应商和模型目录，不接触你的密钥，也不转发任何模型调用。",
+                                     "本机入口只监听 127.0.0.1，并且需要本机密钥才能调用；请求用你自己的密钥直接发往供应商。",
                                      "卸载时可以勾选“删除应用数据”，一并删除保存的密钥和用量记录。"],
         "d_steps_h": "三步上手", "d_steps": ["安装并打开羊毛switch。",
-                                         "在“模型广场”或“平台”里找到平台，一键开通（如 OpenRouter），或去平台注册后粘贴密钥。",
-                                         "打开“接入工具”页，按页面上的地址和本机密钥配置 Cherry Studio、Cline、Claude Code 等工具。OpenAI 兼容工具的接口地址一般是 <code>http://127.0.0.1:17890/v1</code>，模型名直接写平台上的模型名。"],
-        "d_foot": "本地限量按目录里的额度口径估算，默认使用免费额度的 90%。各平台的额度和计费规则以平台官方为准。",
+                                         "在“模型广场”或“供应商”里找到供应商，一键开通（如 OpenRouter），或去供应商注册后粘贴密钥。",
+                                         "打开“接入工具”页，按页面上的地址和本机密钥配置 Cherry Studio、Cline、Claude Code 等工具。OpenAI 兼容工具的接口地址一般是 <code>http://127.0.0.1:17890/v1</code>，模型名直接写供应商上的模型名。"],
+        "d_foot": "本地限量按目录里的额度口径估算，默认使用免费额度的 90%。各供应商的额度和计费规则以供应商官方为准。",
         # join
-        "j_title": "平台入驻 - 羊毛switch", "j_desc": "提供免费额度的平台接入羊毛switch", "j_h1": "平台入驻",
-        "j_lead": "欢迎提供免费额度的平台主动接入。接入越深，用户开通越方便。",
-        "j_th": ("级别", "平台需要做的", "用户能得到的"),
-        "j_rows": [("L1 收录", "向目录仓库提交拉取请求，新增一条结构化条目（额度、模型、注册链接、官方依据）", "在官网和桌面端可见；注册链接可带平台自己的渠道码"),
+        "j_title": "供应商入驻 - 羊毛switch", "j_desc": "提供免费额度的供应商接入羊毛switch", "j_h1": "供应商入驻",
+        "j_lead": "欢迎提供免费额度的供应商主动接入。接入越深，用户开通越方便。",
+        "j_th": ("级别", "供应商需要做的", "用户能得到的"),
+        "j_rows": [("L1 收录", "向目录仓库提交拉取请求，新增一条结构化条目（额度、模型、注册链接、官方依据）", "在官网和桌面端可见；注册链接可带供应商自己的渠道码"),
                    ("L2 半自动", "再提供密钥页链接、密钥前缀、查询剩余额度的接口或响应头", "粘贴密钥即自动识别；本机按真实剩余额度限量"),
                    ("L3 全自动", "再提供 OAuth 2.0 PKCE 公共客户端，允许回调到 127.0.0.1 任意端口，授权后签发密钥", "桌面端一键开通")],
         "j_models": "也欢迎提供无需密钥即可访问的公开模型列表接口（OpenAI 格式的 <code>/models</code>），并说明每个模型是免费、用免费额度还是付费，方便模型广场保持完整。",
-        "j_no": "官方平台、聚合平台和 API 中转站的免费额度都可以收录。注册链接一律用平台官方地址，不放返利或邀请链接；需要虚拟号码、批量注册或多开账号才能拿到的额度不收。",
-        "j_spec": "查看接入规范", "j_submit": "提交一个平台", "j_mail": "邮件联系",
+        "j_no": "官方供应商、聚合平台和 API 中转站的免费额度都可以收录。注册链接一律用供应商官方地址，不放返利或邀请链接；需要虚拟号码、批量注册或多开账号才能拿到的额度不收。",
+        "j_spec": "查看接入规范", "j_submit": "提交一个供应商", "j_mail": "邮件联系",
         # llms
-        "llms_title": "# 羊毛switch", "llms_intro": "开源的大模型密钥与用量管理桌面应用。本站汇总各平台的免费额度和可以免费调用的模型。",
-        "llms_data": "机器可读数据：catalog.json（平台与额度）、models.json（各平台模型列表：免费 / 用免费额度 / 付费，标价）",
-        "llms_p": "## 平台", "llms_m": "## 免费模型", "llms_api": "（{x}当 API 用）", "llms_can": "能", "llms_cannot": "不能", "llms_reg": "。注册 {u}",
-        "feed_title": "羊毛switch 平台目录",
+        "llms_title": "# 羊毛switch", "llms_intro": "开源的大模型密钥与用量管理桌面应用。本站汇总各供应商的免费额度和可以免费调用的模型。",
+        "llms_data": "机器可读数据：catalog.json（供应商与额度）、models.json（各供应商模型列表：免费 / 用免费额度 / 付费，标价）",
+        "llms_p": "## 供应商", "llms_m": "## 免费模型", "llms_api": "（{x}当 API 用）", "llms_can": "能", "llms_cannot": "不能", "llms_reg": "。注册 {u}",
+        "feed_title": "羊毛switch 供应商目录",
     },
     "en": {
         "brand": '<span class="name">Yangmao<span>Switch</span></span>', "brand_text": "YangmaoSwitch", "html_lang": "en", "other": ("zh", "中文"),
-        "nav": {"home": "Home", "models": "Models", "providers": "Providers", "download": "Download", "join": "For platforms"}, "get_app": "Get the app", "submit_btn": "Submit / Report",
+        "nav": {"home": "Home", "models": "Models", "providers": "Providers", "download": "Download", "join": "For providers"}, "get_app": "Get the app", "submit_btn": "Submit / Report",
         "home_title": "YangmaoSwitch - A directory of free LLM APIs", "home_h1": "A directory of free LLM APIs",
-        "home_dl_note": "Windows only for now",
+        "home_dl_note": "The desktop app is Windows-only for now",
         "home_dl": "Download the desktop app",
-        "home_desc": "LLMs you can call for free on each platform, marked as free model, free quota or paid, with every quota linked to the platform’s own terms. The open-source desktop app manages keys and usage locally.",
+        "home_desc": "LLMs you can call for free on each provider, marked as free model, free quota or paid, with every quota linked to the provider’s own terms. The open-source desktop app manages keys and usage locally.",
         "home_cta": "Browse {m} models", "home_fresh": "Refreshed every 6 hours; last update {d}",
         "home_app": "The desktop app keeps your keys in the system keychain, gives Cline, Cherry Studio and other tools one local address, and sends each request to an account with quota left. It stops at 90% of each free quota.",
-        "home_submit": "We aim to keep the catalog current and complete. Users and platforms can <a href=\"{u}\">submit</a> missing or wrong entries, and we verify them before listing.",
-        "tracker_cap": "The top {n} models by popularity, platform by platform", "not_offered": "Not offered",
-        "home_lead": "<b>{m}</b> models you can call for free across <b>{p}</b> platforms. Every quota links to the platform’s own terms, and the data refreshes every 6 hours.",
-        "sec_hot": "Popular free models", "sec_hot_sub": "Ranked by OpenRouter daily usage and the number of platforms serving them",
+        "home_submit": "We aim to keep the catalog current and complete. Users and providers can <a href=\"{u}\">submit</a> missing or wrong entries, and we verify them before listing.",
+        "tracker_cap": "The top {n} models by popularity, provider by provider", "not_offered": "Not offered",
+        "home_lead": "<b>{m}</b> models you can call for free across <b>{p}</b> providers. Every quota links to the provider’s own terms, and the data refreshes every 6 hours.",
+        "sec_hot": "Popular free models", "sec_hot_sub": "Ranked by OpenRouter daily usage and the number of providers serving them",
+        "sec_prov": "Popular providers", "sec_prov_sub": "Ranked by the popular free models they serve",
         "sec_newfree": "New free offers", "sec_newfree_sub": "Free models and free quotas that appeared in the last 14 days",
         "sec_newfree_empty": "No new free offers in the last 14 days. Data updates every 6 hours.",
         "sec_new": "New models", "sec_new_sub": "Released in the last 45 days and callable for free",
-        "sec_forever": "Free with no end date", "sec_forever_sub": "Listed as free models by the platform, not counted against a quota (usually rate-limited); per the platform's terms",
+        "sec_forever": "Free with no end date", "sec_forever_sub": "Listed as free models by the provider, not counted against a quota (usually rate-limited); per the provider's terms",
         "sec_more": "See all", "since": "since {d}",
-        "sort_lbl": "Sort", "sort_heat": "Most popular", "sort_new": "Newest", "sort_platforms": "Most platforms",
+        "sort_lbl": "Sort", "sort_heat": "Most popular", "sort_new": "Newest", "sort_platforms": "Most providers",
         "fix_btn": "Report an error",
-        "sub": {"title": "Submit / Report", "lead": "Submit a new platform or model, or report an error in the catalog. Sign in to submit; we verify each entry before listing or correcting it, and reply under My submissions.",
+        "sub": {"title": "Submit / Report", "lead": "Submit a new provider or model, or report an error in the catalog. Sign in to submit; we verify each entry before listing or correcting it, and reply under My submissions.",
                 "not_ready": "Accounts are not available yet. Meanwhile you can submit on GitHub (a GitHub account is required).", "gh": "Submit on GitHub",
                 "email": "Email", "email_ph": "you@example.com", "send": "Send code", "resend": "Resend in {n}s", "code": "Code", "code_ph": "6 digits",
                 "login": "Sign in", "or": "or", "github": "Sign in with GitHub", "signed_in": "Signed in as {who}", "logout": "Sign out",
-                "kind": "Type", "kinds": {"correction": "Correction", "new_provider": "New platform", "new_model": "New model or quota", "other": "Other"},
-                "target": "Platform or model", "target_ph": "e.g. siliconflow or deepseek/deepseek-v4.1-flash", "stitle": "Title", "stitle_ph": "One line",
+                "kind": "Type", "kinds": {"correction": "Correction", "new_provider": "New provider", "new_model": "New model or quota", "other": "Other"},
+                "target": "Provider or model", "target_ph": "e.g. siliconflow or deepseek/deepseek-v4.1-flash", "stitle": "Title", "stitle_ph": "One line",
                 "body": "Details", "body_ph": "Quota, conditions, what is wrong…", "evidence": "Official source", "evidence_ph": "https://…", "submit": "Submit",
                 "sent_ok": "Submitted, thank you. The result will show under My submissions below.", "mine": "My submissions", "none": "No submissions yet.",
                 "status": {"open": "Open", "accepted": "Accepted", "rejected": "Declined", "done": "Live"}, "note": "Reply: ",
                 "errors": {"bad_email": "Check the email address.", "too_soon": "Wait a moment before requesting another code.", "rate_limited": "Too many attempts; try again later.",
                            "mail_failed": "Could not send the email; try again later.", "code_expired": "The code has expired; request a new one.", "code_wrong": "Wrong code.",
                            "not_signed_in": "Sign in first.", "banned": "This account can no longer submit.", "network": "Cannot reach the server; try again later.", "invalid": "Check the fields."}},
-        "footer": "Quotas and prices are as published by each platform. YangmaoSwitch is open source (MIT) and not affiliated with the platforms listed.",
-        "submit": "Submit a platform or a correction", "contact": "Contact",
+        "footer": "Quotas and prices are as published by each provider. YangmaoSwitch is open source (MIT) and not affiliated with the providers listed.",
+        "submit": "Submit a provider or a correction", "contact": "Contact",
         "unit": {"requests": "requests", "tokens": "tokens", "input_tokens": "input tokens", "output_tokens": "output tokens", "credits": "credits",
                  "points": "points", "neurons": "Neurons", "usd": "USD", "cny": "CNY"},
         "period": {"second": "per second", "minute": "per minute", "hour": "per hour", "day": "per day", "week": "per week", "month": "per month", "one-time": "one-time"},
@@ -197,63 +205,63 @@ T = {
         "tag": {"vision": "Vision", "video": "Video", "audio": "Audio", "tools": "Tools", "reasoning": "Reasoning", "open": "Open weights"},
         "tz": {"UTC": "UTC", "Asia/Shanghai": "Beijing time", "America/Los_Angeles": "Pacific Time"},
         "proto": {"openai": "OpenAI-compatible", "anthropic": "Anthropic", "gemini": "Gemini", "other": "other"},
-        "limit_unknown": "Limited {period} (in {unit}; see the platform for the number)", "reset": "resets at {t} {tz}", "expires": "valid for {n} days", "sep": " · ", "list": ", ",
+        "limit_unknown": "Limited {period} (in {unit}; see the provider for the number)", "reset": "resets at {t} {tz}", "expires": "valid for {n} days", "sep": " · ", "list": ", ",
         "more_platforms": "{names} and {k} more", "no_desc": "No description yet.", "region": {"cn": "China", "global": "Global"},
         "to_verify": "Unverified", "one_click": "One-click", "signup": "Sign-up: ", "overage_l": "When used up: ",
         "models_count": "{t} models ({f} free · {q} on free quota)", "go_signup": "Sign up", "details": "Details", "verified": "Last verified {d}",
         "create_key": "Create a key", "evidence": "Source",
-        "auto_paid_warn": "Note: on this platform, usage switches to paid once the free quota is used up. Turn on a stop-when-used-up setting in the platform console first.",
+        "auto_paid_warn": "Note: on this provider, usage switches to paid once the free quota is used up. Turn on a stop-when-used-up setting in the provider console first.",
         "sq_title": "YangmaoSwitch - Models you can call for free",
-        "sq_desc": "Large language models you can call for free, with every platform that serves them: access, free quota and list price. Open-source key and usage manager.",
+        "sq_desc": "Large language models you can call for free, with every provider that serves them: access, free quota and list price. Open-source key and usage manager.",
         "sq_h1": "Models",
-        "sq_lead": "<b>{m}</b> models you can call for free, served by <b>{p}</b> platforms; {x} of them are available on more than one. Open a model to see each platform's access, free quota and list price.",
+        "sq_lead": "<b>{m}</b> models you can call for free, served by <b>{p}</b> providers; {x} of them are available on more than one. Open a model to see each provider's access, free quota and list price.",
         "sq_about": "YangmaoSwitch is an open-source desktop app for managing your API keys and usage: keys stay on your computer, and calls are metered and capped against each free quota.",
-        "updated": "Data updated {d}. We aim to keep it current and complete; users and platforms are welcome to <a href=\"{u}\">submit</a> entries, which we verify before listing.",
-        "search_model": "Search models…", "skip": "Skip to content", "lbl_cap": "Capability", "lbl_acc": "Access", "lbl_prov": "Platform", "lbl_region": "Region", "lbl_over": "Overage policy",
-        "ex_h": "One model, {n} platforms", "ex_more": "See all platforms", "lang_label": "Switch to Chinese", "all": "All", "cap_vision": "Vision", "cap_tools": "Tools", "cap_reasoning": "Reasoning",
-        "acc_all": "Any access", "acc_free": "Free models only", "acc_quota": "Free or free quota", "all_platforms": "All platforms", "showing": "Showing {n}",
-        "m_title": "Where to call {name} for free - YangmaoSwitch", "m_desc": "{name}: access, free quota and list price on {n} platforms.",
+        "updated": "Data updated {d}. We aim to keep it current and complete; users and providers are welcome to <a href=\"{u}\">submit</a> entries, which we verify before listing.",
+        "search_model": "Search models…", "skip": "Skip to content", "lbl_cap": "Capability", "lbl_acc": "Access", "lbl_prov": "Provider", "lbl_region": "Region", "lbl_over": "Overage policy",
+        "ex_h": "One model, {n} providers", "ex_more": "See all providers", "lang_label": "Switch to Chinese", "all": "All", "cap_vision": "Vision", "cap_tools": "Tools", "cap_reasoning": "Reasoning",
+        "acc_all": "Any access", "acc_free": "Free models only", "acc_quota": "Free or free quota", "all_platforms": "All providers", "showing": "Showing {n}",
+        "m_title": "Where to call {name} for free - YangmaoSwitch", "m_desc": "{name}: access, free quota and list price on {n} providers.",
         "ctx": "Context", "input": "Input", "released": "Released", "weights": "Weights", "ctx_tokens": "{n} tokens",
-        "platforms_h": "Platforms serving this model", "th_platform": "Platform", "th_model": "Model ID", "th_access": "Access", "th_quota": "Free quota",
+        "platforms_h": "Providers serving this model", "th_platform": "Provider", "th_model": "Model ID", "th_access": "Access", "th_quota": "Free quota",
         "th_price": "List price (USD per 1M input / output tokens)",
-        "m_note": "“Free quota” means calls use the platform's free allowance or vouchers. Prices are the platforms' published USD prices, for reference only; “—” means no published price.",
+        "m_note": "“Free quota” means calls use the provider's free allowance or vouchers. Prices are the providers' published USD prices, for reference only; “—” means no published price.",
         "price_free": "Free",
-        "m_cta": "Add these platforms' keys to the <a href=\"{u}\">YangmaoSwitch desktop app</a> and its local endpoint picks an account with quota left for each model.",
-        "p_title": "Providers - YangmaoSwitch", "p_desc": "Free API quotas of LLM platforms, each with an official source.", "p_h1": "Providers",
-        "p_lead": "{n} platforms with free quotas ({a} usable as an API), each quota with an official source.",
-        "p_updated": "Catalog updated {d} · <a href=\"{j}\">Platforms</a> and users are welcome to <a href=\"{u}\">submit</a> entries, which we verify before listing.",
-        "search_p": "Search platforms and tags…", "all_regions": "All regions", "r_cn": "China", "r_global": "Global", "ov_any": "Any overage policy", "ov_blocked": "Stops when used up",
+        "m_cta": "Add these providers' keys to the <a href=\"{u}\">YangmaoSwitch desktop app</a> and its local endpoint picks an account with quota left for each model.",
+        "p_title": "Providers - YangmaoSwitch", "p_desc": "Free API quotas of LLM providers, each with an official source.", "p_h1": "Providers",
+        "p_lead": "{n} providers with free quotas ({a} usable as an API), each quota with an official source.",
+        "p_updated": "Catalog updated {d} · Users and providers are welcome to <a href=\"{u}\">submit</a> entries, which we verify before listing.",
+        "search_p": "Search providers and tags…", "all_regions": "All regions", "r_cn": "China", "r_global": "Global", "ov_any": "Any overage policy", "ov_blocked": "Stops when used up",
         "api_only": "Usable as an API", "l3_only": "One-click sign-up",
         "pp_title": "{name} free quota and models - YangmaoSwitch", "quota_h": "Free quota", "models_h": "Models", "basic_h": "Details", "terms_h": "Terms to note",
         "no_models": "No model list yet; feel free to <a href=\"{u}\">submit</a> one.", "models_sum": "{t} models: {f} free · {q} on free quota · {p} paid.",
-        "k_platform": "Platform", "k_region": "Region", "k_api": "Usable as an API", "k_yes": "Yes", "k_no": "No, only inside the platform's own products",
+        "k_platform": "Provider", "k_region": "Region", "k_api": "Usable as an API", "k_yes": "Yes", "k_no": "No, only inside the provider's own products",
         "k_endpoint": "Endpoint", "k_protocol": "{p} API", "k_requires": "Sign-up requires", "k_blocked": "Not available in", "k_overage": "When used up",
         "k_level": "Onboarding", "k_verified": "Last verified", "k_notes": "Notes",
-        "p_cta": "Add this platform's key to the <a href=\"{u}\">YangmaoSwitch desktop app</a> to meter and cap usage against the quota above on your computer.",
+        "p_cta": "Add this provider's key to the <a href=\"{u}\">YangmaoSwitch desktop app</a> to meter and cap usage against the quota above on your computer.",
         "d_title": "Download - YangmaoSwitch", "d_desc": "Download the YangmaoSwitch desktop app (Windows)", "d_h1": "Download YangmaoSwitch",
         "d_lead": "Manage your API keys and usage on your own computer: find models you can call for free, sign up, and meter and cap usage against each free quota.",
         "d_release": "Latest version <b>{t}</b>, released {d}.", "d_win": "Download for Windows ({s} MB)",
         "d_note": "Windows 10/11 x64 only for now; macOS and Linux will follow. The installer is not code-signed yet, so Windows may warn about an unknown publisher; choose “Run anyway”.",
         "d_none": "No release yet. You can build it from source.", "d_src": "Source code", "d_issues": "Report an issue",
         "d_sec_h": "Security", "d_sec": ["Your keys are stored only in the system keychain on your computer (Windows Credential Manager).",
-                                      "The YangmaoSwitch server only publishes the public platform and model catalog. It never sees your keys or relays model calls.",
-                                      "The local endpoint listens on 127.0.0.1 only and requires a local key; requests go straight to the platforms with your own keys.",
+                                      "The YangmaoSwitch server only publishes the public provider and model catalog. It never sees your keys or relays model calls.",
+                                      "The local endpoint listens on 127.0.0.1 only and requires a local key; requests go straight to the providers with your own keys.",
                                       "When uninstalling, tick “Delete app data” to remove the stored keys and usage records."],
         "d_steps_h": "Get started", "d_steps": ["Install and open YangmaoSwitch.",
-                                             "Find a platform under Models or Providers. Sign up with one click (e.g. OpenRouter), or sign up on the platform and paste your key.",
-                                             "Open the Connect page and configure Cherry Studio, Cline, Claude Code and other tools with the address and local key shown there. For OpenAI-compatible tools the base URL is usually <code>http://127.0.0.1:17890/v1</code>; use the platform's model ID as the model name."],
-        "d_foot": "Local caps are estimated from the catalog's quota definitions and use 90% of each free quota by default. Each platform's own quotas and billing rules apply.",
-        "j_title": "For platforms - YangmaoSwitch", "j_desc": "List your free quota on YangmaoSwitch", "j_h1": "For platforms",
-        "j_lead": "Platforms that offer free quotas are welcome to integrate. The deeper the integration, the easier it is for users to get started.",
-        "j_th": ("Level", "What the platform provides", "What users get"),
-        "j_rows": [("L1 Listing", "A pull request to the catalog repository with a structured entry (quota, models, sign-up link, official source)", "Listed on the website and in the app; the sign-up link may carry the platform's own channel code"),
+                                             "Find a provider under Models or Providers. Sign up with one click (e.g. OpenRouter), or sign up on the provider and paste your key.",
+                                             "Open the Connect page and configure Cherry Studio, Cline, Claude Code and other tools with the address and local key shown there. For OpenAI-compatible tools the base URL is usually <code>http://127.0.0.1:17890/v1</code>; use the provider's model ID as the model name."],
+        "d_foot": "Local caps are estimated from the catalog's quota definitions and use 90% of each free quota by default. Each provider's own quotas and billing rules apply.",
+        "j_title": "For providers - YangmaoSwitch", "j_desc": "List your free quota on YangmaoSwitch", "j_h1": "For providers",
+        "j_lead": "Providers that offer free quotas are welcome to integrate. The deeper the integration, the easier it is for users to get started.",
+        "j_th": ("Level", "What the provider provides", "What users get"),
+        "j_rows": [("L1 Listing", "A pull request to the catalog repository with a structured entry (quota, models, sign-up link, official source)", "Listed on the website and in the app; the sign-up link may carry the provider's own channel code"),
                    ("L2 Assisted", "Also the key page URL, the key prefix, and an endpoint or response headers reporting the remaining quota", "Keys are recognized on paste; usage is capped against the real remaining quota"),
                    ("L3 Automatic", "Also an OAuth 2.0 PKCE public client that allows redirects to any 127.0.0.1 port and issues a key on authorization", "One-click sign-up in the app")],
         "j_models": "A public model list endpoint that needs no key (OpenAI-style <code>/models</code>), with whether each model is free, on free quota or paid, helps keep the model list complete.",
-        "j_no": "Free quotas from official platforms, aggregators and API resellers can all be listed. Sign-up links always point to the platform's official address, never to referral or invite links. Quotas that require virtual phone numbers, bulk sign-ups or multiple accounts are not listed.",
-        "j_spec": "Integration guide", "j_submit": "Submit a platform", "j_mail": "Email us",
+        "j_no": "Free quotas from official providers, aggregators and API resellers can all be listed. Sign-up links always point to the provider's official address, never to referral or invite links. Quotas that require virtual phone numbers, bulk sign-ups or multiple accounts are not listed.",
+        "j_spec": "Integration guide", "j_submit": "Submit a provider", "j_mail": "Email us",
         "llms_title": "# YangmaoSwitch", "llms_intro": "Open-source desktop app for managing LLM API keys and usage. This site lists free quotas and the models you can call for free.",
-        "llms_data": "Machine-readable data: catalog.json (platforms and quotas), models.json (each platform's models: free / free quota / paid, list prices)",
+        "llms_data": "Machine-readable data: catalog.json (providers and quotas), models.json (each provider's models: free / free quota / paid, list prices)",
         "llms_p": "## Providers", "llms_m": "## Free models", "llms_api": " ({x} usable as an API)", "llms_can": "", "llms_cannot": "not", "llms_reg": ". Sign up: {u}",
         "feed_title": "YangmaoSwitch providers",
     },
@@ -279,6 +287,37 @@ def latest_release() -> dict | None:
 
 def slug(s: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
+
+
+# Brand logos (static/logos, from LobeHub Icons and Simple Icons). Pages write "@@ROOT@@" and write() fills in the relative root.
+PROVIDER_LOGOS = {
+    "aihubmix": "aihubmix-color", "aliyun-bailian": "bailian-color", "amd-radeon-cloud": "amd", "cloudflare-workers-ai": "workersai-color",
+    "cohere": "cohere-color", "google-ai-studio": "aistudio", "groq": "groq", "modelscope": "modelscope-color", "nvidia-nim": "nvidia-color",
+    "opencode": "opencode", "openrouter": "openrouter", "siliconflow": "siliconcloud-color", "tencent-hunyuan": "hunyuan-color",
+    "volcengine-ark": "volcengine-color", "zhipu-bigmodel": "zhipu-color", "qiniu": "qiniu-color",
+}
+MODEL_LOGOS = [  # first match on "vendor id name"
+    (r"qwen|qwq|qvq|tongyi", "qwen-color"), (r"deepseek", "deepseek-color"), (r"\bglm|zhipu|z\.ai|zai-org|chatglm|cogview", "zhipu-color"),
+    (r"kimi|moonshot", "kimi-color"), (r"minimax", "minimax-color"), (r"gemma", "gemma-color"), (r"gemini", "gemini-color"),
+    (r"nemotron|nvidia", "nvidia-color"), (r"mimo|xiaomi", "xiaomimimo"), (r"llama|\bmeta\b", "meta-color"),
+    (r"mistral|magistral|devstral|codestral", "mistral-color"), (r"\bstep|stepfun", "stepfun-color"), (r"ernie|baidu|paddle", "wenxin-color"),
+    (r"hunyuan|tencent|\bhy\d", "hunyuan-color"), (r"doubao|seed|bytedance", "doubao-color"), (r"\bling\b|\bring\b|inclusionai", "ling-color"),
+    (r"longcat|meituan", "longcat-color"), (r"intern|shanghai_ai", "internlm-color"), (r"cohere|command|\baya\b|north-", "cohere-color"),
+    (r"gpt|openai", "openai"), (r"claude|anthropic", "anthropic"), (r"baai|bge", "baai"), (r"google", "google-color"),
+]
+
+
+def logo_img(file: str, cls: str) -> str:
+    return f'<span class="{cls} logo"><img src="@@ROOT@@logos/{file}.svg" alt="" width="20" height="20" loading="lazy" decoding="async"></span>'
+
+
+def provider_logo(pid: str, cls: str = "av") -> str:
+    return logo_img(PROVIDER_LOGOS.get(pid, "generic"), cls)
+
+
+def model_logo(m: dict, cls: str = "av") -> str:
+    text = f"{m.get('vendor') or ''} {m['id']} {m['name']}".lower()
+    return logo_img(next((f for r, f in MODEL_LOGOS if re.search(r, text)), "generic"), cls)
 
 
 def avatar(name: str, seed: str, cls: str = "av") -> str:
@@ -376,7 +415,7 @@ class Site:
         other_lang, other_label = self.t["other"]
         other = (home + "en/" if self.L == "zh" else home + "../") + rel
         alt_zh, alt_en = SITE + rel, SITE + "en/" + rel
-        links = [("home", "index.html"), ("models", "models.html"), ("providers", "providers.html"), ("download", "download.html"), ("join", "providers-join.html")]
+        links = [("models", "models.html"), ("providers", "providers.html")]
         navs = "".join(f'<a href="{home}{h}"{" aria-current=page" if k == nav else ""}>{self.t["nav"][k]}</a>' for k, h in links)
         doc = f"""<!doctype html>
 <html lang="{self.t['html_lang']}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -392,14 +431,17 @@ class Site:
 </head><body>
 <a class="skip" href="#main">{self.t['skip']}</a>
 <header><div class="bar"><a class="brand" href="{home}index.html" translate="no"><img src="{root}icon.png" alt="" width="26" height="26">{self.t['brand']}</a>
-<nav>{navs}<a href="{REPO}">GitHub</a></nav>
-<a class="lang" href="{other}" hreflang="{other_lang}" lang="{other_lang}" aria-label="{self.t['lang_label']}">{other_label}</a>
-<a class="btn small" href="{home}submit.html">{self.t['submit_btn']}</a>
-<a class="btn primary small" href="{home}download.html">{self.t['get_app']}</a></div></header>
+<nav>{navs}</nav>
+<div class="tools">
+<a class="icon-link" href="{other}" hreflang="{other_lang}" lang="{other_lang}" aria-label="{self.t['lang_label']}" title="{self.t['lang_label']}">{ICON_LANG}<span>{other_label}</span></a>
+<a class="icon-link" href="{home}submit.html" aria-label="{self.t['submit_btn']}" title="{self.t['submit_btn']}">{ICON_SUBMIT}</a>
+<a class="icon-link" href="{REPO}" aria-label="GitHub" title="GitHub">{ICON_GITHUB}</a>
+<a class="btn primary small" href="{home}download.html">{ICON_DOWNLOAD}{self.t['get_app']}</a></div></div></header>
 <main id="main">{body}</main>
 <footer><p>{self.t['footer']}
 <a href="{REPO}/catalog/issues/new/choose">{self.t['submit']}</a>{(" · " + self.t['contact'] + f' <a href="mailto:{EMAIL}">{EMAIL}</a>') if EMAIL else ""}</p></footer>
 <script src="{root}app.js"></script></body></html>"""
+        doc = doc.replace("@@ROOT@@", root)
         path = self.out / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(doc, encoding="utf-8")
@@ -456,7 +498,7 @@ class Site:
         tone = {"free": "ok", "quota": "blue", "paid": ""}[best]
         tag_html = f'<span class="mtag {tone}">{t["access"][best]}</span>' + "".join(f'<span class="mtag">{e(x)}</span>' for x in self.tags(m))
         return f"""<a class="mcard" href="m/{e(m['slug'])}.html" data-search="{e(search.lower())}" data-caps="{' '.join(caps)}" data-providers=" {' '.join(o['provider'] for o in offers)} " data-access="{best}" data-heat="{m.get('heat', 0)}" data-created="{e(m.get('created') or '')}" data-n="{len(offers)}">
-<div class="mcard-head">{avatar(m.get('vendor') or m['name'], m.get('vendor') or offers[0]['provider'])}<div><b translate="no">{e(title)}</b><span>{e(plats)}</span></div></div>
+<div class="mcard-head">{model_logo(m)}<div><b translate="no">{e(title)}</b><span>{e(plats)}</span></div></div>
 <p class="mdesc">{e(self.desc(m) or t['no_desc'])}</p>
 <div class="mtags">{tag_html}</div></a>"""
 
@@ -467,7 +509,7 @@ class Site:
             p = self.provs.get(o["provider"])
             q = self.quota_text(p, self.pick_quota(p, o["access"])) if p and p.get("quotas") and o["access"] != "paid" else ""
             tone = {"free": "ok", "quota": "blue", "paid": ""}[o["access"]]
-            rows.append(f"""<tr><td><a class="plat" href="../p/{e(o['provider'])}.html">{avatar(self.pname(o['provider']), o['provider'], 'av sm')}{e(self.pname(o['provider']))}</a></td>
+            rows.append(f"""<tr><td><a class="plat" href="../p/{e(o['provider'])}.html">{provider_logo(o['provider'], 'av sm')}{e(self.pname(o['provider']))}</a></td>
 <td><code translate="no">{e(o['model'])}</code></td><td><span class="mtag {tone}">{t['access'][o['access']]}</span></td><td>{e(q) or '—'}</td><td class="num">{self.price_cell(o.get('price'))}</td></tr>""")
         facts = []
         if m.get("context_length"):
@@ -480,7 +522,7 @@ class Site:
         d = self.desc(m)
         tag_html = "".join(f'<span class="mtag">{e(x)}</span>' for x in self.tags(m))
         body = f"""<p class="crumb"><a href="../models.html">{t['nav']['models']}</a> / {e(m['name'])}</p>
-<div class="mhead">{avatar(m.get('vendor') or m['name'], m.get('vendor') or m['offers'][0]['provider'], 'av lg')}<div><h1 translate="no">{e(m['name'])}</h1><p class="muted">{e(m.get('vendor') or '')}</p></div></div>
+<div class="mhead">{model_logo(m, 'av lg')}<div><h1 translate="no">{e(m['name'])}</h1><p class="muted">{e(m.get('vendor') or '')}</p></div></div>
 {f'<p class="lead">{e(d)}</p>' if d else ''}
 <div class="mtags">{tag_html}</div>
 <table class="kv">{''.join(f'<tr><th>{k}</th><td>{v}</td></tr>' for k, v in facts)}</table>
@@ -508,7 +550,7 @@ class Site:
         summary = self.ptext(p, "summary")
         search = " ".join([p["name"], p.get("name_zh", ""), summary, " ".join(self.ptags(p))])
         return f"""<article class="card" data-tags="{e(' '.join(tg))}" data-search="{e(search.lower())}">
-<div class="card-head">{avatar(name, p['id'])}<h3><a href="p/{e(p['id'])}.html">{e(name)}</a></h3>{''.join(badges)}</div>
+<div class="card-head">{provider_logo(p['id'])}<h3><a href="p/{e(p['id'])}.html">{e(name)}</a></h3>{''.join(badges)}</div>
 {f'<p>{e(summary)}</p>' if summary else ''}
 <ul class="quotas">{quotas}</ul>
 <p class="meta"><span>{t['signup']}{e(req)}</span><span{over_cls}>{t['overage_l']}{t['overage'][p['overage']]}</span>{mc}</p>
@@ -562,7 +604,7 @@ class Site:
         summary = self.ptext(p, "summary")
         sub = p["name"] if self.L == "zh" and p.get("name_zh") else ""
         body = f"""<p class="crumb"><a href="../providers.html">{t['nav']['providers']}</a> / {e(name)}</p>
-<div class="mhead">{avatar(name, p['id'], 'av lg')}<div><h1>{e(name)}</h1>{f'<p class="muted">{e(sub)}</p>' if sub else ''}</div></div>
+<div class="mhead">{provider_logo(p['id'], 'av lg')}<div><h1>{e(name)}</h1>{f'<p class="muted">{e(sub)}</p>' if sub else ''}</div></div>
 {f'<p class="lead">{e(summary)}</p>' if summary else ''}{warn}
 <h2>{t['quota_h']}</h2><ul>{quotas}</ul>
 <h2>{t['models_h']}</h2>{models}
@@ -616,27 +658,32 @@ class Site:
             except ValueError:
                 return 10**6
 
-        hot = sorted(models, key=lambda m: m.get("heat", 0), reverse=True)[:6]
-        out = [section("hot", '<div class="mgrid">' + "".join(self.model_card(m) for m in hot) + "</div>", "models.html")]
+        row = lambda ms: '<div class="mgrid one-row">' + "".join(self.model_card(m) for m in ms) + "</div>"
+        ranked = sorted(models, key=lambda m: m.get("heat", 0), reverse=True)
+        out = [section("hot", row(ranked[:4]), "models.html")]
 
-        fresh = sorted(((o, m) for m in models for o in m["offers"] if o["access"] != "paid" and o.get("since") and o["since"] > baseline and days_ago(o["since"]) <= 14),
-                       key=lambda x: x[0]["since"], reverse=True)[:12]
-        if fresh:
-            rows = "".join(
-                f'<li><a href="m/{e(m["slug"])}.html"><span class="plat">{avatar(self.pname(o["provider"]), o["provider"], "av sm")}{e(self.pname(o["provider"]))}</span>'
-                f'<b translate="no">{e(m["name"])}</b><span class="mtag {dict(free="ok", quota="blue")[o["access"]]}">{t["access"][o["access"]]}</span>'
-                f'<span class="muted small">{t["since"].format(d=e(o["since"]))}</span></a></li>' for o, m in fresh)
-            body = f'<ul class="feed">{rows}</ul>'
-        else:
-            body = f'<p class="empty-note">{t["sec_newfree_empty"]}</p>'
-        out.append(section("newfree", body, "models.html?sort=new"))
+        # popular providers: weight of the popular models they serve for free or on a free quota
+        score: dict[str, float] = {}
+        for m in models:
+            for o in m["offers"]:
+                if o["access"] != "paid" and o["provider"] in self.provs:
+                    score[o["provider"]] = score.get(o["provider"], 0) + m.get("heat", 0)
+        top = sorted(score, key=lambda x: -score[x])[:4]
+        cards = []
+        for pid in top:
+            p, pm = self.provs[pid], self.pmodels.get(pid) or {}
+            q = self.quota_text(p, 0) if p.get("quotas") else ""
+            cards.append(f'<a class="pcard" href="p/{e(pid)}.html"><div class="mcard-head">{provider_logo(pid)}<div><b>{e(self.pname(pid))}</b>'
+                         f'<span>{t["models_count"].format(t=pm.get("total", 0), f=pm.get("free", 0), q=pm.get("quota", 0))}</span></div></div>'
+                         f'<p class="mdesc">{e(q)}</p></a>')
+        out.append(section("prov", f'<div class="mgrid one-row">{"".join(cards)}</div>', "providers.html"))
 
-        new = sorted((m for m in models if days_ago(m.get("created")) <= 45), key=lambda m: m.get("created") or "", reverse=True)[:6]
+        new = sorted((m for m in models if days_ago(m.get("created")) <= 45), key=lambda m: m.get("created") or "", reverse=True)[:4]
         if new:
-            out.append(section("new", '<div class="mgrid">' + "".join(self.model_card(m) for m in new) + "</div>", "models.html?sort=new"))
+            out.append(section("new", row(new), "models.html?sort=new"))
 
-        forever = [m for m in sorted(models, key=lambda m: m.get("heat", 0), reverse=True) if any(o["access"] == "free" for o in m["offers"])][:6]
-        out.append(section("forever", '<div class="mgrid">' + "".join(self.model_card(m) for m in forever) + "</div>", "models.html?access=free"))
+        forever = [m for m in ranked if any(o["access"] == "free" for o in m["offers"])][:4]
+        out.append(section("forever", row(forever), "models.html?access=free"))
         return "".join(out)
 
     # ---------------------------------------------------------------- pages
@@ -649,7 +696,7 @@ class Site:
         hero = f"""<section class="hero split home-hero"><div class="hero-text">
 <h1>{t['home_h1']}</h1>
 <p class="lead">{t['home_lead'].format(m=len(models), p=len(providers))}</p>
-<p class="hero-cta"><a class="btn primary" href="models.html">{t['home_cta'].format(m=len(models))}</a><a href="download.html">{t['home_dl']}</a><span class="muted small">{t['home_dl_note']}</span></p>
+<p class="hero-cta"><a class="btn primary" href="models.html">{t['home_cta'].format(m=len(models))}</a><span class="muted small">{t['home_dl_note']}</span></p>
 <p class="muted">{t['home_app']}</p></div>
 {self.tracker(models)}</section>"""
         self.write("index.html", t["home_title"], hero + self.home_sections(), t["home_desc"], "home")
@@ -733,7 +780,7 @@ class Site:
 <table class="kv"><tr>{th}</tr>{jr}</table>
 <p>{t['j_models']}</p><p>{t['j_no']}</p>
 <p class="actions"><a class="btn primary" href="{REPO}/catalog/blob/main/CONTRIBUTING.md">{t['j_spec']}</a> <a class="btn" href="{issues}">{t['j_submit']}</a> {f'<a class="btn" href="mailto:{EMAIL}">{t["j_mail"]}</a>' if EMAIL else ''}</p>"""
-        self.write("providers-join.html", t["j_title"], join, t["j_desc"], "join")
+        # providers-join.html is not published until it has a proper design
 
         base = SITE if self.L == "zh" else SITE + "en/"
         feed = {"version": "https://jsonfeed.org/version/1.1", "title": t["feed_title"], "home_page_url": base,
@@ -773,6 +820,7 @@ def main() -> None:
     for f in ("style.css", "app.js", "submit.js", "icon.png"):
         shutil.copy(ROOT / "static" / f, OUT / f)
     shutil.copytree(ROOT / "static" / "fonts", OUT / "fonts")
+    shutil.copytree(ROOT / "static" / "logos", OUT / "logos")
     dl_items = []
     for f in sorted((ROOT / "static" / "download").glob("*.exe")) if (ROOT / "static" / "download").exists() else []:
         shutil.copy(f, OUT / "download" / f.name)

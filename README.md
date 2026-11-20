@@ -26,3 +26,5 @@ python build.py path/to/catalog.json path/to/models.json  # 用本地数据构�
 [MIT](LICENSE)
 
 字体：`static/fonts` 为 Geist / Geist Mono（Vercel，SIL Open Font License 1.1，取自 Fontsource），只用于拉丁字符，中文使用系统字体。
+
+标志：`static/logos` 取自 [LobeHub Icons](https://github.com/lobehub/lobe-icons)（MIT）和 [Simple Icons](https://simpleicons.org)（CC0），商标归各自所有者，仅用于指代对应厂商。
