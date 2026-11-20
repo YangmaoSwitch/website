@@ -37,13 +37,15 @@ T = {
     "zh": {
         "brand": '<span class="name">羊毛<span>switch</span></span>', "brand_text": "羊毛switch", "html_lang": "zh-CN", "other": ("en", "English"),
         "nav": {"home": "首页", "models": "模型广场", "providers": "平台", "download": "下载", "join": "平台入驻"}, "get_app": "下载桌面端", "submit_btn": "提交 / 纠错",
-        "home_title": "羊毛switch - 免费大模型，哪家给、给多少", "home_h1": "免费大模型，<br>哪家给、给多少",
-        "home_desc": "跟踪各平台的免费大模型：哪些是免费模型、哪些消耗赠送额度、哪些要付费，额度和标价附官方出处，每 6 小时刷新。",
-        "home_cta": "进入模型广场", "home_fresh": "每 6 小时刷新，最近一次 {d}",
-        "home_app": "想在自己的工具里直接调用？<a href=\"{u}\">桌面应用</a>把密钥留在你的电脑上，按免费额度记账，快用完时停止转发。",
+        "home_title": "羊毛switch - 免费大模型 API 目录", "home_h1": "免费大模型 API 目录",
+        "home_dl_note": "目前只有 Windows 版",
+        "home_dl": "下载桌面应用",
+        "home_desc": "收录各平台可以免费调用的大模型，标明免费模型、赠送额度和付费，每条额度链接到平台原文。配套开源桌面应用在本机管理密钥和用量。",
+        "home_cta": "浏览 {m} 个模型", "home_fresh": "每 6 小时刷新，最近一次 {d}",
+        "home_app": "桌面应用把各平台的密钥存在系统钥匙串里，给 Cline、Cherry Studio 等工具提供一个本机地址，把请求转给还有额度的账号，用到 90% 就停。",
         "home_submit": "目录尽量保持最新、完整。发现遗漏或错误，欢迎用户和平台方<a href=\"{u}\">提交</a>，我们核实后上架。",
-        "tracker_cap": "热度前 {n} 的模型，在各平台怎么用", "not_offered": "不提供",
-        "home_lead": "我们跟踪 <b>{p}</b> 个平台上的 <b>{m}</b> 个模型，标出哪些是免费模型、哪些消耗赠送额度、哪些要付费。每条额度和标价都附平台自己的出处。",
+        "tracker_cap": "热度前 {n} 的模型在各平台的提供方式", "not_offered": "不提供",
+        "home_lead": "收录 <b>{p}</b> 个平台、<b>{m}</b> 个可以免费调用的模型。每条额度都链接到平台原文，数据每 6 小时刷新一次。",
         "sec_hot": "热门免费模型", "sec_hot_sub": "按 OpenRouter 每日用量和提供平台数排序",
         "sec_newfree": "新上免费用量", "sec_newfree_sub": "最近 14 天新出现的免费模型或免费额度",
         "sec_newfree_empty": "最近 14 天没有新上的免费用量。数据每 6 小时更新一次。",
@@ -151,13 +153,15 @@ T = {
     "en": {
         "brand": '<span class="name">Yangmao<span>Switch</span></span>', "brand_text": "YangmaoSwitch", "html_lang": "en", "other": ("zh", "中文"),
         "nav": {"home": "Home", "models": "Models", "providers": "Providers", "download": "Download", "join": "For platforms"}, "get_app": "Get the app", "submit_btn": "Submit / Report",
-        "home_title": "YangmaoSwitch - Free LLMs, platform by platform", "home_h1": "Free LLMs,<br>platform by platform",
-        "home_desc": "Which LLM platforms offer free models or free quotas, and how much: access, quotas and list prices with official sources, refreshed every 6 hours.",
-        "home_cta": "Browse the models", "home_fresh": "Refreshed every 6 hours; last update {d}",
-        "home_app": "Want to call them from your own tools? The <a href=\"{u}\">desktop app</a> keeps your keys on your computer, meters each free quota and stops forwarding before it runs out.",
+        "home_title": "YangmaoSwitch - A directory of free LLM APIs", "home_h1": "A directory of free LLM APIs",
+        "home_dl_note": "Windows only for now",
+        "home_dl": "Download the desktop app",
+        "home_desc": "LLMs you can call for free on each platform, marked as free model, free quota or paid, with every quota linked to the platform’s own terms. The open-source desktop app manages keys and usage locally.",
+        "home_cta": "Browse {m} models", "home_fresh": "Refreshed every 6 hours; last update {d}",
+        "home_app": "The desktop app keeps your keys in the system keychain, gives Cline, Cherry Studio and other tools one local address, and sends each request to an account with quota left. It stops at 90% of each free quota.",
         "home_submit": "We aim to keep the catalog current and complete. Users and platforms can <a href=\"{u}\">submit</a> missing or wrong entries, and we verify them before listing.",
-        "tracker_cap": "The {n} most popular models, platform by platform", "not_offered": "Not offered",
-        "home_lead": "We track <b>{m}</b> models on <b>{p}</b> platforms and mark which are free, which draw on a free quota and which are paid. Every quota and price links to the platform’s own source.",
+        "tracker_cap": "The top {n} models by popularity, platform by platform", "not_offered": "Not offered",
+        "home_lead": "<b>{m}</b> models you can call for free across <b>{p}</b> platforms. Every quota links to the platform’s own terms, and the data refreshes every 6 hours.",
         "sec_hot": "Popular free models", "sec_hot_sub": "Ranked by OpenRouter daily usage and the number of platforms serving them",
         "sec_newfree": "New free offers", "sec_newfree_sub": "Free models and free quotas that appeared in the last 14 days",
         "sec_newfree_empty": "No new free offers in the last 14 days. Data updates every 6 hours.",
@@ -645,8 +649,8 @@ class Site:
         hero = f"""<section class="hero split home-hero"><div class="hero-text">
 <h1>{t['home_h1']}</h1>
 <p class="lead">{t['home_lead'].format(m=len(models), p=len(providers))}</p>
-<p class="hero-cta"><a class="btn primary" href="models.html">{t['home_cta']}</a><span class="muted small">{t['home_fresh'].format(d=e((self.sq.get('generated_at') or '')[:10]))}</span></p>
-<p class="muted">{t['home_app'].format(u='download.html')}</p></div>
+<p class="hero-cta"><a class="btn primary" href="models.html">{t['home_cta'].format(m=len(models))}</a><a href="download.html">{t['home_dl']}</a><span class="muted small">{t['home_dl_note']}</span></p>
+<p class="muted">{t['home_app']}</p></div>
 {self.tracker(models)}</section>"""
         self.write("index.html", t["home_title"], hero + self.home_sections(), t["home_desc"], "home")
         hero = f"""<section class="hero"><h1>{t['sq_h1']}</h1>
