@@ -174,3 +174,9 @@ select { background-color:var(--surface); color:var(--ink); }
 .mine p { margin:6px 0 0; }
 @media (max-width:720px) { .feed a { grid-template-columns:minmax(0,1fr) auto; } .feed .plat { grid-column:1 / -1; } }
 [hidden] { display:none !important; }
+.brand .name { color:var(--ink); } .brand .name span { color:#c48a00; }
+.example .plat { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.example li .mtag { flex:none; }
+.hero.split .muted { margin:8px 0 0; }
+.brand .name { text-autospace:no-autospace; white-space:nowrap; }
+@media (min-width:721px) { .bar { gap:18px; } nav { flex-wrap:nowrap; min-width:0; overflow-x:auto; scrollbar-width:none; } nav a { white-space:nowrap; padding:6px 10px; } .bar > .btn, .lang { white-space:nowrap; flex:none; } }

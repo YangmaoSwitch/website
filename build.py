@@ -35,10 +35,13 @@ e = html.escape
 # ---------------------------------------------------------------- strings
 T = {
     "zh": {
-        "brand": '羊毛<span>switch</span>', "brand_text": "羊毛switch", "html_lang": "zh-CN", "other": ("en", "English"),
+        "brand": '<span class="name">羊毛<span>switch</span></span>', "brand_text": "羊毛switch", "html_lang": "zh-CN", "other": ("en", "English"),
         "nav": {"home": "首页", "models": "模型广场", "providers": "平台", "download": "下载", "join": "平台入驻"}, "get_app": "下载桌面端", "submit_btn": "提交 / 纠错",
-        "home_title": "羊毛switch - 哪些大模型可以免费调用", "home_h1": "哪些大模型可以免费调用",
-        "home_lead": "汇总 <b>{p}</b> 个平台的免费额度和 <b>{m}</b> 个可以免费调用的模型，按热度排序，列出每个平台的调用方式、免费额度和标价。",
+        "home_title": "羊毛switch - 跟踪免费大模型平台", "home_h1": "跟踪免费大模型平台",
+        "home_desc": "跟踪各平台的免费大模型：哪些平台在提供、怎么计费、送多少额度、标价多少，额度规则附官方链接。",
+        "home_about": "数据每 6 小时更新一次，最近一次是 {d}。配套的开源桌面应用把各平台的密钥存在你自己的电脑上，按免费额度记账，用到 90% 就停止转发，比例可以调。",
+        "home_submit": "目录尽量保持最新、完整。发现遗漏或错误，欢迎用户和平台方<a href=\"{u}\">提交</a>，我们核实后上架。",
+        "home_lead": "收录 <b>{p}</b> 个平台、<b>{m}</b> 个可以免费调用的模型。点开一个模型，能看到哪些平台在提供、怎么计费、送多少额度、标价多少。每条额度规则都附官方链接。",
         "sec_hot": "热门免费模型", "sec_hot_sub": "按 OpenRouter 每日用量和提供平台数排序",
         "sec_newfree": "新上免费用量", "sec_newfree_sub": "最近 14 天新出现的免费模型或免费额度",
         "sec_newfree_empty": "最近 14 天没有新上的免费用量。数据每 6 小时更新一次。",
@@ -144,10 +147,13 @@ T = {
         "feed_title": "羊毛switch 平台目录",
     },
     "en": {
-        "brand": 'Yangmao<span>Switch</span>', "brand_text": "YangmaoSwitch", "html_lang": "en", "other": ("zh", "中文"),
+        "brand": '<span class="name">Yangmao<span>Switch</span></span>', "brand_text": "YangmaoSwitch", "html_lang": "en", "other": ("zh", "中文"),
         "nav": {"home": "Home", "models": "Models", "providers": "Providers", "download": "Download", "join": "For platforms"}, "get_app": "Get the app", "submit_btn": "Submit / Report",
-        "home_title": "YangmaoSwitch - LLMs you can call for free", "home_h1": "LLMs you can call for free",
-        "home_lead": "Free quotas of <b>{p}</b> platforms and <b>{m}</b> models you can call for free, ranked by popularity, with each platform's access, free quota and list price.",
+        "home_title": "YangmaoSwitch - Tracking free LLM platforms", "home_h1": "Tracking free LLM platforms",
+        "home_desc": "Tracking LLM platforms with free quotas: who serves each model, how it is billed, the free quota and the list price, with official sources.",
+        "home_about": "Data refreshes every 6 hours; last update {d}. The open-source desktop app keeps your keys on your own computer, meters usage against each free quota and stops forwarding at 90% of it. The threshold is adjustable.",
+        "home_submit": "We aim to keep the catalog current and complete. Users and platforms can <a href=\"{u}\">submit</a> missing or wrong entries, and we verify them before listing.",
+        "home_lead": "<b>{p}</b> platforms and <b>{m}</b> models you can call for free. Open a model to see which platforms serve it, how each one bills it, the free quota and the list price. Every quota rule links to its official source.",
         "sec_hot": "Popular free models", "sec_hot_sub": "Ranked by OpenRouter daily usage and the number of platforms serving them",
         "sec_newfree": "New free offers", "sec_newfree_sub": "Free models and free quotas that appeared in the last 14 days",
         "sec_newfree_empty": "No new free offers in the last 14 days. Data updates every 6 hours.",
@@ -610,11 +616,12 @@ class Site:
         hero = f"""<section class="hero split"><div>
 <h1>{t['home_h1']}</h1>
 <p class="lead">{t['home_lead'].format(m=len(models), p=len(providers))}</p>
-<p class="muted">{t['sq_about']} {t['updated'].format(d=e((self.sq.get('generated_at') or '')[:10]), u='submit.html')}</p></div>
+<p class="muted">{t['home_about'].format(d=e((self.sq.get('generated_at') or '')[:10]))}</p>
+<p class="muted">{t['home_submit'].format(u='submit.html')}</p></div>
 <a class="example" href="m/{e(ex['slug'])}.html"><span class="ex-h">{t['ex_h'].format(n=len(ex['offers']))}</span>
 <span class="ex-model">{avatar(ex.get('vendor') or ex['name'], ex.get('vendor') or ex['offers'][0]['provider'])}<b translate="no">{e(ex['name'])}</b></span>
 <ul>{ex_rows}</ul><span class="ex-more">{t['ex_more']}</span></a></section>"""
-        self.write("index.html", t["home_title"], hero + self.home_sections(), t["sq_desc"], "home")
+        self.write("index.html", t["home_title"], hero + self.home_sections(), t["home_desc"], "home")
         hero = f"""<section class="hero"><h1>{t['sq_h1']}</h1>
 <p class="lead">{t['sq_lead'].format(m=len(models), p=len(used), x=multi)}</p>
 <p class="muted">{t['updated'].format(d=e((self.sq.get('generated_at') or '')[:10]), u='submit.html')}</p></section>"""
