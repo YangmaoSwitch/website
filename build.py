@@ -703,7 +703,7 @@ class Site:
             for o in m["offers"]:
                 if o["access"] != "paid" and o["provider"] in self.provs:
                     score[o["provider"]] = score.get(o["provider"], 0) + m.get("heat", 0)
-        top = sorted(score, key=lambda x: -score[x])[:4]
+        top = [p["id"] for p in self.providers if p["id"] in score][:4]  # same ranking as the providers page
         cards = []
         for pid in top:
             p, pm = self.provs[pid], self.pmodels.get(pid) or {}
@@ -845,7 +845,13 @@ class Site:
 def main() -> None:
     cat = load(sys.argv[1] if len(sys.argv) > 1 else f"{DIST}/catalog.json")
     sq = load(sys.argv[2] if len(sys.argv) > 2 else f"{DIST}/models.json")
-    providers = sorted(cat["providers"], key=lambda p: (p["status"] != "verified", p["onboarding"]["level"] != "L3", p["name"].lower()))
+    # providers rank by the popularity of the models they serve for free or on a free quota
+    pheat: dict[str, float] = {}
+    for m in sq["models"]:
+        for o in m["offers"]:
+            if o["access"] != "paid":
+                pheat[o["provider"]] = pheat.get(o["provider"], 0) + (m.get("heat") or 0)
+    providers = sorted(cat["providers"], key=lambda p: (-pheat.get(p["id"], 0), p["name"].lower()))
     models = sq["models"]
     seen: set[str] = set()
     slug_of: dict[str, str] = {}
