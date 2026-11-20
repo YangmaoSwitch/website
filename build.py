@@ -42,7 +42,7 @@ e = html.escape
 T = {
     "zh": {
         "brand": '<span class="name">羊毛<span>switch</span></span>', "brand_text": "羊毛switch", "html_lang": "zh-CN", "other": ("en", "English"),
-        "nav": {"home": "首页", "models": "模型广场", "providers": "供应商", "download": "下载", "join": "供应商入驻"}, "get_app": "下载桌面端", "submit_btn": "提交 / 纠错",
+        "nav": {"home": "首页", "models": "模型广场", "providers": "供应商", "blog": "博客", "download": "下载", "join": "供应商入驻"}, "get_app": "下载桌面端", "submit_btn": "提交 / 纠错",
         "home_title": "羊毛switch - 免费大模型 API 目录", "home_h1": "免费大模型 API 目录",
         "home_dl_note": "桌面应用目前只有 Windows 版",
         "home_dl": "下载桌面应用",
@@ -53,6 +53,7 @@ T = {
         "tracker_cap": "热度前 {n} 的模型在各供应商的提供方式", "not_offered": "不提供",
         "home_lead": "收录 <b>{p}</b> 个供应商、<b>{m}</b> 个可以免费调用的模型。每条额度都链接到供应商原文，数据每 6 小时刷新一次。",
         "sec_hot": "热门免费模型", "sec_hot_sub": "按 OpenRouter 每日用量和提供它的供应商数排序",
+        "blog_title": "博客 - 羊毛switch", "blog_h1": "博客", "blog_lead": "目录怎么做、数据从哪来、桌面应用的更新说明。",
         "sec_prov": "热门供应商", "sec_prov_sub": "按提供的热门免费模型排序",
         "sec_newfree": "新上免费用量", "sec_newfree_sub": "最近 14 天新出现的免费模型或免费额度",
         "sec_newfree_empty": "最近 14 天没有新上的免费用量。数据每 6 小时更新一次。",
@@ -159,7 +160,7 @@ T = {
     },
     "en": {
         "brand": '<span class="name">Yangmao<span>Switch</span></span>', "brand_text": "YangmaoSwitch", "html_lang": "en", "other": ("zh", "中文"),
-        "nav": {"home": "Home", "models": "Models", "providers": "Providers", "download": "Download", "join": "For providers"}, "get_app": "Get the app", "submit_btn": "Submit / Report",
+        "nav": {"home": "Home", "models": "Models", "providers": "Providers", "blog": "Blog", "download": "Download", "join": "For providers"}, "get_app": "Get the app", "submit_btn": "Submit / Report",
         "home_title": "YangmaoSwitch - A directory of free LLM APIs", "home_h1": "A directory of free LLM APIs",
         "home_dl_note": "The desktop app is Windows-only for now",
         "home_dl": "Download the desktop app",
@@ -170,6 +171,7 @@ T = {
         "tracker_cap": "The top {n} models by popularity, provider by provider", "not_offered": "Not offered",
         "home_lead": "<b>{m}</b> models you can call for free across <b>{p}</b> providers. Every quota links to the provider’s own terms, and the data refreshes every 6 hours.",
         "sec_hot": "Popular free models", "sec_hot_sub": "Ranked by OpenRouter daily usage and the number of providers serving them",
+        "blog_title": "Blog - YangmaoSwitch", "blog_h1": "Blog", "blog_lead": "How the catalog is built, where the data comes from, and desktop app release notes.",
         "sec_prov": "Popular providers", "sec_prov_sub": "Ranked by the popular free models they serve",
         "sec_newfree": "New free offers", "sec_newfree_sub": "Free models and free quotas that appeared in the last 14 days",
         "sec_newfree_empty": "No new free offers in the last 14 days. Data updates every 6 hours.",
@@ -340,6 +342,28 @@ def ctx_text(n) -> str:
     return f"{n / 1048576:.1f}".rstrip("0").rstrip(".") + "M" if n >= 1e6 else f"{round(n / 1024)}K"
 
 
+BLOG = ROOT / "blog"
+
+
+def load_posts(lang: str) -> list[dict]:
+    """Published posts of one language: blog/<slug>.<lang>.md with a small front matter block."""
+    out = []
+    for f in sorted(BLOG.glob(f"*.{lang}.md")) if BLOG.exists() else []:
+        text = f.read_text(encoding="utf-8")
+        meta: dict[str, str] = {}
+        if text.startswith("---\n"):
+            head, _, text = text[4:].partition("\n---\n")
+            for line in head.splitlines():
+                k, _, v = line.partition(":")
+                meta[k.strip()] = v.strip().strip('"')
+        if meta.get("draft", "").lower() == "true" and not os.environ.get("YM_BLOG_DRAFTS"):  # YM_BLOG_DRAFTS=1 previews drafts locally
+            continue
+        import markdown  # only needed when there are posts
+        out.append({"slug": f.name[: -len(f".{lang}.md")], "title": meta.get("title", f.stem), "date": meta.get("date", ""),
+                    "summary": meta.get("summary", ""), "html": markdown.markdown(text, extensions=["tables", "fenced_code", "sane_lists"])})
+    return sorted(out, key=lambda x: x["date"], reverse=True)
+
+
 class Site:
     def __init__(self, lang: str, cat: dict, sq: dict, providers: list, models: list, slug_of: dict):
         self.L = lang
@@ -348,6 +372,7 @@ class Site:
         self.provs = {p["id"]: p for p in providers}
         self.pmodels = sq.get("providers") or {}
         self.out = OUT if lang == "zh" else OUT / "en"
+        self.posts = load_posts(lang)
 
     # text of catalog entries in this language
     def pname(self, pid: str) -> str:
@@ -415,7 +440,7 @@ class Site:
         other_lang, other_label = self.t["other"]
         other = (home + "en/" if self.L == "zh" else home + "../") + rel
         alt_zh, alt_en = SITE + rel, SITE + "en/" + rel
-        links = [("models", "models.html"), ("providers", "providers.html")]
+        links = [("models", "models.html"), ("providers", "providers.html")] + ([("blog", "blog/index.html")] if self.posts else [])
         navs = "".join(f'<a href="{home}{h}"{" aria-current=page" if k == nav else ""}>{self.t["nav"][k]}</a>' for k, h in links)
         doc = f"""<!doctype html>
 <html lang="{self.t['html_lang']}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -781,6 +806,17 @@ class Site:
 <p>{t['j_models']}</p><p>{t['j_no']}</p>
 <p class="actions"><a class="btn primary" href="{REPO}/catalog/blob/main/CONTRIBUTING.md">{t['j_spec']}</a> <a class="btn" href="{issues}">{t['j_submit']}</a> {f'<a class="btn" href="mailto:{EMAIL}">{t["j_mail"]}</a>' if EMAIL else ''}</p>"""
         # providers-join.html is not published until it has a proper design
+
+        if self.posts:
+            items = "".join(
+                f'<li><a href="{e(x["slug"])}.html"><time datetime="{e(x["date"])}">{e(x["date"])}</time><b>{e(x["title"])}</b>'
+                + (f'<span>{e(x["summary"])}</span>' if x["summary"] else "") + '</a></li>' for x in self.posts)
+            self.write("blog/index.html", t["blog_title"], f'<section class="hero"><h1>{t["blog_h1"]}</h1><p class="lead">{t["blog_lead"]}</p></section><ul class="post-list">{items}</ul>',
+                       t["blog_lead"], "blog")
+            for x in self.posts:
+                body = (f'<p class="crumb"><a href="index.html">{t["nav"]["blog"]}</a></p><article class="post"><h1>{e(x["title"])}</h1>'
+                        f'<p class="muted"><time datetime="{e(x["date"])}">{e(x["date"])}</time></p><div class="prose">{x["html"]}</div></article>')
+                self.write(f"blog/{x['slug']}.html", f"{x['title']} - {t['brand_text']}", body, x["summary"], "blog")
 
         base = SITE if self.L == "zh" else SITE + "en/"
         feed = {"version": "https://jsonfeed.org/version/1.1", "title": t["feed_title"], "home_page_url": base,

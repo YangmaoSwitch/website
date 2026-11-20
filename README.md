@@ -12,6 +12,21 @@
 - **平台入驻页**：L1／L2／L3 接入规范，详见 [catalog/CONTRIBUTING.md](https://github.com/YangmaoSwitch/catalog/blob/main/CONTRIBUTING.md)。
 - **机器可读**：`catalog.json`、`models.json`、JSON feed、给 Agent 读取的 `llms.txt`。
 
+## 博客
+
+文章放在 `blog/<slug>.<语言>.md`（语言为 `zh` 或 `en`），开头是简单的头信息：
+
+```
+---
+title: 标题
+date: 2026-11-20
+summary: 一句话摘要
+draft: true
+---
+```
+
+`draft: true` 的文章不发布；本地预览草稿用 `YM_BLOG_DRAFTS=1 python build.py`。某种语言没有已发布文章时，导航里不显示“博客”。构建需要 `pip install markdown`。
+
 ## 数据与构建
 
 全部来自 [YangmaoSwitch/catalog](https://github.com/YangmaoSwitch/catalog) 的 `dist` 分支（`catalog.json`、`models.json`），由 `build.py` 静态生成到 `public/`，GitHub Actions 部署到 GitHub Pages。
