@@ -69,7 +69,8 @@ T = {
         "ctx": "上下文", "input": "输入", "released": "上线时间", "weights": "开源权重", "ctx_tokens": "{n} Token",
         "platforms_h": "提供这个模型的平台", "th_platform": "平台", "th_model": "模型名", "th_access": "方式", "th_quota": "免费额度",
         "th_price": "标价（每百万输入 / 输出 Token，美元）",
-        "m_note": "“用免费额度”指调用会消耗平台送的免费额度或代金券。标价为平台公开的美元价格，仅供参考。",
+        "m_note": "“用免费额度”指调用会消耗平台送的免费额度或代金券。标价为平台公开的美元价格，仅供参考；“—”表示没有公开标价。",
+        "price_free": "免费",
         "m_cta": "用 <a href=\"{u}\">羊毛switch 桌面端</a> 添加这些平台的密钥后，本机入口会按模型名自动选用有额度的账号。",
         # generated description
         "gd_vendor": "{v} 的", "gd_open": "开源", "gd_model": "模型。", "gd_ctx": "上下文 {c}", "gd_input": "可输入{m}", "gd_tools": "支持工具调用",
@@ -153,7 +154,8 @@ T = {
         "ctx": "Context", "input": "Input", "released": "Released", "weights": "Weights", "ctx_tokens": "{n} tokens",
         "platforms_h": "Platforms serving this model", "th_platform": "Platform", "th_model": "Model ID", "th_access": "Access", "th_quota": "Free quota",
         "th_price": "List price (USD per 1M input / output tokens)",
-        "m_note": "“Free quota” means calls use the platform's free allowance or vouchers. Prices are the platforms' published USD prices, for reference only.",
+        "m_note": "“Free quota” means calls use the platform's free allowance or vouchers. Prices are the platforms' published USD prices, for reference only; “—” means no published price.",
+        "price_free": "Free",
         "m_cta": "Add these platforms' keys to the <a href=\"{u}\">YangmaoSwitch desktop app</a> and its local endpoint picks an account with quota left for each model.",
         "p_title": "Providers - YangmaoSwitch", "p_desc": "Free API quotas of LLM platforms, each with an official source.", "p_h1": "Providers",
         "p_lead": "{n} platforms with free quotas ({a} usable as an API), each quota with an official source.",
@@ -294,6 +296,11 @@ class Site:
             parts.append(t["expires"].format(n=q["expires_days"]))
         return t["sep"].join(parts)
 
+    def price_cell(self, p: dict | None) -> str:
+        if not p:
+            return "—"
+        return self.t["price_free"] if p["input"] == 0 and p["output"] == 0 else e(price_text(p))
+
     def pick_quota(self, p: dict, access: str) -> int:
         """Index of the quota that applies: free models use the model-specific limit, others the general quota or credits."""
         qs = p["quotas"]
@@ -397,7 +404,7 @@ class Site:
             q = self.quota_text(p, self.pick_quota(p, o["access"])) if p and p.get("quotas") and o["access"] != "paid" else ""
             tone = {"free": "ok", "quota": "blue", "paid": ""}[o["access"]]
             rows.append(f"""<tr><td><a class="plat" href="../p/{e(o['provider'])}.html">{avatar(self.pname(o['provider']), o['provider'], 'av sm')}{e(self.pname(o['provider']))}</a></td>
-<td><code translate="no">{e(o['model'])}</code></td><td><span class="mtag {tone}">{t['access'][o['access']]}</span></td><td>{e(q) or '—'}</td><td class="num">{e(price_text(o.get('price'))) or '—'}</td></tr>""")
+<td><code translate="no">{e(o['model'])}</code></td><td><span class="mtag {tone}">{t['access'][o['access']]}</span></td><td>{e(q) or '—'}</td><td class="num">{self.price_cell(o.get('price'))}</td></tr>""")
         facts = []
         if m.get("context_length"):
             facts.append((t["ctx"], t["ctx_tokens"].format(n=f"{m['context_length']:,}")))
@@ -483,10 +490,10 @@ class Site:
                 def cell(x):
                     code = f'<code translate="no">{e(x["model"])}</code>'
                     return f'<a href="../m/{e(self.slug_of[x["model"]])}.html">{code}</a>' if x["model"] in self.slug_of else code
-                li = "".join(f'<tr><td>{cell(x)}</td><td class="num">{e(price_text(x.get("price"))) or "—"}</td></tr>' for x in lst)
+                li = "".join(f'<tr><td>{cell(x)}</td><td class="num">{self.price_cell(x.get("price"))}</td></tr>' for x in lst)
                 groups.append(f'<details{" open" if acc != "paid" else ""}><summary>{t["group"][acc]} <span class="muted">{len(lst)}</span></summary>'
                               f'<table class="list"><thead><tr><th>{t["th_model"]}</th><th>{t["th_price"]}</th></tr></thead><tbody>{li}</tbody></table></details>')
-            models = f'<p class="muted">{t["models_sum"].format(t=pm["total"], f=pm["free"], q=pm["quota"], p=pm["paid"])}</p>' + "".join(groups)
+            models = f'<p class="muted">{t["models_sum"].format(t=pm["total"], f=pm["free"], q=pm["quota"], p=pm["paid"])}</p>' + "".join(groups) + f'<p class="muted small">{t["m_note"]}</p>'
         summary = self.ptext(p, "summary")
         sub = p["name"] if self.L == "zh" and p.get("name_zh") else ""
         body = f"""<p class="crumb"><a href="../providers.html">{t['nav']['providers']}</a> / {e(name)}</p>
