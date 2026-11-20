@@ -25,7 +25,7 @@ OUT = ROOT / "public"
 DIST = "https://raw.githubusercontent.com/YangmaoSwitch/catalog/dist"
 SITE = "https://yangmaoswitch.github.io/website/"
 REPO = "https://github.com/YangmaoSwitch"
-EMAIL = "kangletian@hotmail.com"
+EMAIL = os.environ.get("YM_CONTACT_EMAIL", "")  # contact address on the own domain; not shown until set
 API_BASE = os.environ.get("YM_API_BASE", "").rstrip("/")  # account service; empty until it is deployed
 RANK = {"free": 0, "quota": 1, "paid": 2}
 COLORS = ["#c2410c", "#1d4ed8", "#047857", "#6d28d9", "#b91c1c", "#0369a1", "#a16207", "#0f766e", "#be185d", "#4338ca"]
@@ -384,7 +384,7 @@ class Site:
 <a class="btn primary small" href="{home}download.html">{self.t['get_app']}</a></div></header>
 <main id="main">{body}</main>
 <footer><p>{self.t['footer']}
-<a href="{REPO}/catalog/issues/new/choose">{self.t['submit']}</a> · {self.t['contact']} <a href="mailto:{EMAIL}">{EMAIL}</a></p></footer>
+<a href="{REPO}/catalog/issues/new/choose">{self.t['submit']}</a>{(" · " + self.t['contact'] + f' <a href="mailto:{EMAIL}">{EMAIL}</a>') if EMAIL else ""}</p></footer>
 <script src="{root}app.js"></script></body></html>"""
         path = self.out / rel
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -694,7 +694,7 @@ class Site:
         join = f"""<h1>{t['j_h1']}</h1><p class="lead">{t['j_lead']}</p>
 <table class="kv"><tr>{th}</tr>{jr}</table>
 <p>{t['j_models']}</p><p>{t['j_no']}</p>
-<p class="actions"><a class="btn primary" href="{REPO}/catalog/blob/main/CONTRIBUTING.md">{t['j_spec']}</a> <a class="btn" href="{issues}">{t['j_submit']}</a> <a class="btn" href="mailto:{EMAIL}">{t['j_mail']}</a></p>"""
+<p class="actions"><a class="btn primary" href="{REPO}/catalog/blob/main/CONTRIBUTING.md">{t['j_spec']}</a> <a class="btn" href="{issues}">{t['j_submit']}</a> {f'<a class="btn" href="mailto:{EMAIL}">{t["j_mail"]}</a>' if EMAIL else ''}</p>"""
         self.write("providers-join.html", t["j_title"], join, t["j_desc"], "join")
 
         base = SITE if self.L == "zh" else SITE + "en/"
