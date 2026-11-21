@@ -50,18 +50,18 @@ T = {
         "home_cta": "浏览 {m} 个模型", "home_fresh": "每 6 小时刷新，最近一次 {d}",
         "home_app": "桌面应用把各供应商的密钥存在系统钥匙串里，给 Cline、Cherry Studio 等工具提供一个本机地址，把请求转给还有额度的账号，用到 90% 就停。",
         "home_submit": "目录尽量保持最新、完整。发现遗漏或错误，欢迎用户和供应商<a href=\"{u}\">提交</a>，我们核实后上架。",
-        "tracker_cap": "热度前 {n} 的模型在各供应商的提供方式", "not_offered": "不提供",
+        "tracker_cap": "排名前 {n} 的模型在各供应商的提供方式", "not_offered": "不提供",
         "home_lead": "收录 <b>{m}</b> 个可以免费调用的模型。每条额度都链接到供应商原文，数据每 6 小时刷新一次。",
-        "sec_hot": "热门免费模型", "sec_hot_sub": "按 OpenRouter 每日用量和提供它的供应商数排序",
+        "sec_hot": "免费好模型", "sec_hot_sub": "先看能否长期免费用，再看下载量、供应商数和发布时间",
         "blog_title": "博客 - 羊毛switch", "blog_h1": "博客", "blog_lead": "目录怎么做、数据从哪来、桌面应用的更新说明。",
         "models_short": "{t} 个（免费 {f} · 用免费额度 {q}）",
-        "sec_prov": "热门供应商", "sec_prov_sub": "按提供的热门免费模型排序",
+        "sec_prov": "推荐供应商", "sec_prov_sub": "按免费提供的模型排序，长期免费的权重最高",
         "sec_newfree": "新上免费用量", "sec_newfree_sub": "最近 14 天新出现的免费模型或免费额度",
         "sec_newfree_empty": "最近 14 天没有新上的免费用量。数据每 6 小时更新一次。",
         "sec_new": "新模型", "sec_new_sub": "最近 45 天上线、可以免费调用的模型",
         "sec_forever": "不限期免费", "sec_forever_sub": "供应商列为免费模型、不消耗额度（通常有限速），以供应商公布为准",
         "sec_more": "查看全部", "since": "{d} 起",
-        "sort_lbl": "排序", "sort_heat": "按热度", "sort_new": "最新上线", "sort_platforms": "供应商最多",
+        "sort_lbl": "排序", "sort_heat": "推荐", "sort_new": "最新上线", "sort_platforms": "供应商最多",
         "fix_btn": "纠错",
         "sub": {"title": "提交 / 纠错", "lead": "提交新供应商、新模型，或指出目录里的错误。登录后提交，我们核实后上架或更正，并在“我的提交”里回复处理结果。",
                 "not_ready": "账号系统还在准备中，暂时可以在 GitHub 上提交（需要 GitHub 账号）。", "gh": "在 GitHub 上提交",
@@ -169,18 +169,18 @@ T = {
         "home_cta": "Browse {m} models", "home_fresh": "Refreshed every 6 hours; last update {d}",
         "home_app": "The desktop app keeps your keys in the system keychain, gives Cline, Cherry Studio and other tools one local address, and sends each request to an account with quota left. It stops at 90% of each free quota.",
         "home_submit": "We aim to keep the catalog current and complete. Users and providers can <a href=\"{u}\">submit</a> missing or wrong entries, and we verify them before listing.",
-        "tracker_cap": "The top {n} models by popularity, provider by provider", "not_offered": "Not offered",
+        "tracker_cap": "The top {n} models, provider by provider", "not_offered": "Not offered",
         "home_lead": "<b>{m}</b> models you can call for free. Every quota links to the provider’s own terms, and the data refreshes every 6 hours.",
-        "sec_hot": "Popular free models", "sec_hot_sub": "Ranked by OpenRouter daily usage and the number of providers serving them",
+        "sec_hot": "Best free models", "sec_hot_sub": "Lasting free access first, then downloads, provider count and release date",
         "blog_title": "Blog - YangmaoSwitch", "blog_h1": "Blog", "blog_lead": "How the catalog is built, where the data comes from, and desktop app release notes.",
         "models_short": "{t} ({f} free · {q} on free quota)",
-        "sec_prov": "Popular providers", "sec_prov_sub": "Ranked by the popular free models they serve",
+        "sec_prov": "Recommended providers", "sec_prov_sub": "Ranked by the models they serve for free; lasting free access counts most",
         "sec_newfree": "New free offers", "sec_newfree_sub": "Free models and free quotas that appeared in the last 14 days",
         "sec_newfree_empty": "No new free offers in the last 14 days. Data updates every 6 hours.",
         "sec_new": "New models", "sec_new_sub": "Released in the last 45 days and callable for free",
         "sec_forever": "Free with no end date", "sec_forever_sub": "Listed as free models by the provider, not counted against a quota (usually rate-limited); per the provider's terms",
         "sec_more": "See all", "since": "since {d}",
-        "sort_lbl": "Sort", "sort_heat": "Most popular", "sort_new": "Newest", "sort_platforms": "Most providers",
+        "sort_lbl": "Sort", "sort_heat": "Recommended", "sort_new": "Newest", "sort_platforms": "Most providers",
         "fix_btn": "Report an error",
         "sub": {"title": "Submit / Report", "lead": "Submit a new provider or model, or report an error in the catalog. Sign in to submit; we verify each entry before listing or correcting it, and reply under My submissions.",
                 "not_ready": "Accounts are not available yet. Meanwhile you can submit on GitHub (a GitHub account is required).", "gh": "Submit on GitHub",
@@ -697,7 +697,7 @@ class Site:
         ranked = sorted(models, key=lambda m: m.get("heat", 0), reverse=True)
         out = [section("hot", row(ranked[:4]), "models.html")]
 
-        # popular providers: weight of the popular models they serve for free or on a free quota
+        # recommended providers: those serving models for free or on a free quota, in the catalog's order
         score: dict[str, float] = {}
         for m in models:
             for o in m["offers"]:
@@ -845,8 +845,8 @@ class Site:
 def main() -> None:
     cat = load(sys.argv[1] if len(sys.argv) > 1 else f"{DIST}/catalog.json")
     sq = load(sys.argv[2] if len(sys.argv) > 2 else f"{DIST}/models.json")
-    # providers rank by the catalog's score: popularity of the models each serves without charge, weighted by how
-    # lasting the access is (free models x3, renewing free quota x1, one-time gift x0.3); unverified entries last
+    # providers rank by the catalog's score: quality of the models each serves without charge, weighted by how
+    # lasting the access is (free models x1, renewing free quota x0.5, one-time gift x0.2); unverified entries last
     pinfo = sq.get("providers") or {}
     pheat = {pid: v.get("score", 0) for pid, v in pinfo.items()}
     providers = sorted(cat["providers"], key=lambda p: (p.get("status") != "verified", -pheat.get(p["id"], 0), p["name"].lower()))
