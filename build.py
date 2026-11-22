@@ -85,7 +85,7 @@ T = {
         "overage": {"blocked": "用完即停", "auto_paid": "用完自动转付费", "manual": "需手动开通付费", "unknown": "未知"},
         "level": {"L1": "手动添加密钥", "L2": "粘贴密钥自动识别", "L3": "一键开通"},
         "access": {"free": "免费模型", "quota": "用免费额度", "paid": "付费"},
-        "group": {"free": "免费模型", "quota": "用免费额度", "paid": "付费"},
+        "group": {"usable": "免费", "free": "免费模型", "quota": "用免费额度", "paid": "付费"},
         "modal": {"text": "文本", "image": "图片", "video": "视频", "audio": "音频", "file": "文件"},
         "tag": {"vision": "视觉", "video": "视频理解", "audio": "音频", "tools": "工具调用", "reasoning": "推理模型", "open": "开源权重"},
         "tz": {"UTC": "UTC 时间", "Asia/Shanghai": "北京时间", "America/Los_Angeles": "太平洋时间"},
@@ -111,7 +111,7 @@ T = {
         "ctx": "上下文", "input": "输入", "released": "上线时间", "weights": "开源权重", "ctx_tokens": "{n} Token",
         "platforms_h": "提供这个模型的供应商", "th_platform": "供应商", "th_model": "模型名", "th_access": "方式", "th_quota": "免费额度",
         "th_price": "标价（每百万输入 / 输出 Token，美元）",
-        "m_note": "“用免费额度”指调用会消耗供应商送的免费额度或代金券。标价为供应商公开的美元价格，仅供参考；“—”表示没有公开标价。",
+        "m_note": "“免费”包括完全免费的模型，以及调用会消耗供应商赠送额度或代金券的模型。标价为供应商公开的美元价格，仅供参考；“—”表示没有公开标价。",
         "price_free": "免费",
         "m_cta": "用 <a href=\"{u}\">羊毛switch 桌面端</a> 添加这些供应商的密钥后，本机入口会按模型名自动选用有额度的账号。",
         # generated description
@@ -124,7 +124,7 @@ T = {
         "search_p": "搜索供应商、标签…", "all_regions": "全部地区", "r_cn": "国内", "r_global": "海外", "ov_any": "超额处理不限", "ov_blocked": "只看用完即停",
         "api_only": "只看能当 API 用的", "l3_only": "只看能一键开通的",
         "pp_title": "{name} 免费额度与模型 - 羊毛switch", "quota_h": "免费额度", "models_h": "模型", "basic_h": "基本信息", "terms_h": "条款要点",
-        "no_models": "暂无模型列表，欢迎<a href=\"{u}\">提交</a>。", "models_sum": "共 {t} 个：免费 {f} · 用免费额度 {q} · 付费 {p}。",
+        "no_models": "暂无模型列表，欢迎<a href=\"{u}\">提交</a>。", "models_sum": "共 {t} 个：免费 {f} · 付费 {p}。",
         "k_platform": "供应商", "k_region": "地区", "k_api": "能否当 API 用", "k_yes": "能", "k_no": "不能，只能在供应商自己的产品里用", "k_endpoint": "接口",
         "k_protocol": "{p} 协议", "k_requires": "注册要求", "k_blocked": "不支持地区", "k_overage": "额度用完后", "k_level": "开通方式",
         "k_verified": "最后核实", "k_notes": "说明",
@@ -204,7 +204,7 @@ T = {
         "overage": {"blocked": "Stops when used up", "auto_paid": "Switches to paid when used up", "manual": "Paid use must be enabled manually", "unknown": "Unknown"},
         "level": {"L1": "Add a key manually", "L2": "Paste a key, detected automatically", "L3": "One-click sign-up"},
         "access": {"free": "Free model", "quota": "Free quota", "paid": "Paid"},
-        "group": {"free": "Free models", "quota": "On free quota", "paid": "Paid"},
+        "group": {"usable": "Free", "free": "Free models", "quota": "On free quota", "paid": "Paid"},
         "modal": {"text": "text", "image": "images", "video": "video", "audio": "audio", "file": "files"},
         "tag": {"vision": "Vision", "video": "Video", "audio": "Audio", "tools": "Tools", "reasoning": "Reasoning", "open": "Open weights"},
         "tz": {"UTC": "UTC", "Asia/Shanghai": "Beijing time", "America/Los_Angeles": "Pacific Time"},
@@ -228,7 +228,7 @@ T = {
         "ctx": "Context", "input": "Input", "released": "Released", "weights": "Weights", "ctx_tokens": "{n} tokens",
         "platforms_h": "Providers serving this model", "th_platform": "Provider", "th_model": "Model ID", "th_access": "Access", "th_quota": "Free quota",
         "th_price": "List price (USD per 1M input / output tokens)",
-        "m_note": "“Free quota” means calls use the provider's free allowance or vouchers. Prices are the providers' published USD prices, for reference only; “—” means no published price.",
+        "m_note": "“Free” covers fully free models and models whose calls use the provider's free allowance or vouchers. Prices are the providers' published USD prices, for reference only; “—” means no published price.",
         "price_free": "Free",
         "m_cta": "Add these providers' keys to the <a href=\"{u}\">YangmaoSwitch desktop app</a> and its local endpoint picks an account with quota left for each model.",
         "p_title": "Providers - YangmaoSwitch", "p_desc": "Free LLM API quotas from Chinese and global providers, checked by our agents in real time, each with an official source.", "p_h1": "Providers",
@@ -237,7 +237,7 @@ T = {
         "search_p": "Search providers and tags…", "all_regions": "All regions", "r_cn": "China", "r_global": "Global", "ov_any": "Any overage policy", "ov_blocked": "Stops when used up",
         "api_only": "Usable as an API", "l3_only": "One-click sign-up",
         "pp_title": "{name} free quota and models - YangmaoSwitch", "quota_h": "Free quota", "models_h": "Models", "basic_h": "Details", "terms_h": "Terms to note",
-        "no_models": "No model list yet; feel free to <a href=\"{u}\">submit</a> one.", "models_sum": "{t} models: {f} free · {q} on free quota · {p} paid.",
+        "no_models": "No model list yet; feel free to <a href=\"{u}\">submit</a> one.", "models_sum": "{t} models: {f} free · {p} paid.",
         "k_platform": "Provider", "k_region": "Region", "k_api": "Usable as an API", "k_yes": "Yes", "k_no": "No, only inside the provider's own products",
         "k_endpoint": "Endpoint", "k_protocol": "{p} API", "k_requires": "Sign-up requires", "k_blocked": "Not available in", "k_overage": "When used up",
         "k_level": "Onboarding", "k_verified": "Last verified", "k_notes": "Notes",
@@ -661,8 +661,9 @@ class Site:
         models = f'<p class="muted">{t["no_models"].format(u=REPO + "/catalog/issues/new/choose")}</p>'
         if pm and pm["total"]:
             groups = []
-            for acc in ("free", "quota", "paid"):
-                lst = [x for x in pm["models"] if x["access"] == acc]
+            # two groups only: usable for free (free models and models on the free quota) and paid only
+            for acc, kinds in (("usable", ("free", "quota")), ("paid", ("paid",))):
+                lst = [x for x in pm["models"] if x["access"] in kinds]
                 if not lst:
                     continue
 
@@ -672,7 +673,7 @@ class Site:
                 li = "".join(f'<tr><td>{cell(x)}</td><td class="num">{self.price_cell(x.get("price"))}</td></tr>' for x in lst)
                 groups.append(f'<details{" open" if acc != "paid" else ""}><summary>{t["group"][acc]} <span class="muted">{len(lst)}</span></summary>'
                               f'<table class="list"><thead><tr><th>{t["th_model"]}</th><th>{t["th_price"]}</th></tr></thead><tbody>{li}</tbody></table></details>')
-            models = f'<p class="muted">{t["models_sum"].format(t=pm["total"], f=pm["free"], q=pm["quota"], p=pm["paid"])}</p>' + "".join(groups) + f'<p class="muted small">{t["m_note"]}</p>'
+            models = f'<p class="muted">{t["models_sum"].format(t=pm["total"], f=pm["free"] + pm["quota"], p=pm["paid"])}</p>' + "".join(groups) + f'<p class="muted small">{t["m_note"]}</p>'
         summary = self.ptext(p, "summary")
         sub = p["name"] if self.L == "zh" and p.get("name_zh") else ""
         body = f"""<p class="crumb"><a href="../providers.html">{t['nav']['providers']}</a> / {e(name)}</p>
