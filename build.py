@@ -302,6 +302,8 @@ PROVIDER_LOGOS = {
     "kilo-code": "kilocode", "ovhcloud-ai-endpoints": "ovh", "mistral": "mistral-color", "cerebras": "cerebras-color",
     "vercel-ai-gateway": "vercel", "aion-labs": "aionlabs", "z-ai": "zai", "tencent-tokenhub": "tencentcloud-color",
     "sensenova": "sensenova-color", "moark": "giteeai", "xfyun-spark": "spark-color",
+    "fireworks": "fireworks-color", "hyperbolic": "hyperbolic-color", "novita": "novita-color", "nous-portal": "nousresearch",
+    "pollinations": "pollinations", "inception-labs": "inception",
 }
 MODEL_LOGOS = [  # first match on "vendor id name"
     (r"qwen|qwq|qvq|tongyi", "qwen-color"), (r"deepseek", "deepseek-color"), (r"\bglm|zhipu|z\.ai|zai-org|chatglm|cogview", "zhipu-color"),

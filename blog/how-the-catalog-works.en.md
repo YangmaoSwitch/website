@@ -36,11 +36,11 @@ The same model has different IDs on different providers, for example `deepseek-a
 
 The model list is sorted by "Recommended" by default. The score is the model's own score multiplied by how freely it can be used.
 
-The model score combines several sources so no single site decides: downloads of open-weight models on ModelScope, the number of providers serving the model, daily usage from OpenRouter's rankings page (it only publishes the top 20, so it carries less weight), and the release date. Models released in the last 30 days get a bonus; models older than six months and one year are discounted step by step. Embedding, rerank and speech models are discounted too, since the list is mainly for chat models.
+The model score combines several sources so no single site decides: downloads of open-weight models on ModelScope, the number of providers serving the model (up to 10), daily usage from OpenRouter's rankings page (it only publishes the top 20, so it carries less weight), and the release date. Models released in the last 30 days get a bonus; models older than six months and one year are discounted step by step. Embedding, rerank and speech models are discounted too, since the list is mainly for chat models.
 
-Free access counts the best offer: a free model is 1, a free quota that renews daily or monthly is 0.5, a one-time gift is 0.2, and paid-only offers barely count. Each further provider offering it without charge adds a little, up to 50% more.
+Free access counts the best offer: a free model is 1, a free quota that renews daily or monthly is 0.5, a one-time gift is 0.1, and paid-only offers barely count. Each further provider offering it without charge adds a little, up to 50% more.
 
-Providers are ranked with the same weights: the scores of the models each one serves without charge, multiplied by how freely, added together. Verified providers come before unverified ones.
+Providers are ranked with the same weights: the scores of the models each one serves without charge, multiplied by how freely, with the best 10 added together. Verified providers come before unverified ones.
 
 ## What is still inaccurate
 
