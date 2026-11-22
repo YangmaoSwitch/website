@@ -658,11 +658,14 @@ class Site:
         """The hero visual: the most popular models against the platforms that serve them, one cell per pair."""
         t = self.t
         rows = sorted(models, key=lambda m: m.get("heat", 0), reverse=True)[:8]
+        # columns: the best-ranked providers (same order as the providers page) offering at least two of these free
         count: dict[str, int] = {}
         for m in rows:
             for o in m["offers"]:
-                count[o["provider"]] = count.get(o["provider"], 0) + (2 if o["access"] != "paid" else 1)
-        cols = sorted(count, key=lambda x: (-count[x], self.pname(x)))[:8]
+                if o["access"] != "paid":
+                    count[o["provider"]] = count.get(o["provider"], 0) + 1
+        rank = {p["id"]: i for i, p in enumerate(self.providers)}
+        cols = sorted((p for p in count if count[p] >= 2 and p in rank), key=lambda x: rank[x])[:8]
         def short(pid: str) -> str:  # column labels: drop parentheses, keep at most two words
             n = re.sub(r"\s*\(.*?\)", "", self.pname(pid)).strip()
             w = n.split()
