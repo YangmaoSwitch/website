@@ -299,6 +299,9 @@ PROVIDER_LOGOS = {
     "cohere": "cohere-color", "google-ai-studio": "aistudio", "groq": "groq", "modelscope": "modelscope-color", "nvidia-nim": "nvidia-color",
     "opencode": "opencode", "openrouter": "openrouter", "siliconflow": "siliconcloud-color", "tencent-hunyuan": "hunyuan-color",
     "volcengine-ark": "volcengine-color", "zhipu-bigmodel": "zhipu-color", "qiniu": "qiniu-color",
+    "kilo-code": "kilocode", "ovhcloud-ai-endpoints": "ovh", "mistral": "mistral-color", "cerebras": "cerebras-color",
+    "vercel-ai-gateway": "vercel", "aion-labs": "aionlabs", "z-ai": "zai", "tencent-tokenhub": "tencentcloud-color",
+    "sensenova": "sensenova-color", "moark": "giteeai", "xfyun-spark": "spark-color",
 }
 MODEL_LOGOS = [  # first match on "vendor id name"
     (r"qwen|qwq|qvq|tongyi", "qwen-color"), (r"deepseek", "deepseek-color"), (r"\bglm|zhipu|z\.ai|zai-org|chatglm|cogview", "zhipu-color"),
