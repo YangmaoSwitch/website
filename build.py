@@ -54,7 +54,7 @@ T = {
         "home_lead": "我们用 agent 实时检查国内外最新的免费 Token，目前收录 <b>{m}</b> 个可以免费调用的模型。每条额度都链接到供应商原文。",
         "sec_hot": "免费好模型", "sec_hot_sub": "先看能否长期免费用，再看下载量、供应商数和发布时间",
         "blog_title": "博客 - 羊毛switch", "blog_h1": "博客", "blog_lead": "目录怎么做、数据从哪来、桌面应用的更新说明。",
-        "models_short": "{t} 个（免费 {f} · 用免费额度 {q}）",
+        "models_short": "{t} 个（可免费用 {f} · 纯收费 {p}）", "new_user": "新用户活动", "refill": {"hour": "每小时", "day": "每日", "week": "每周", "month": "每月"}, "over_refill": "{o}，{r}刷新", "over_once": "{o}，不再补充",
         "sec_prov": "推荐供应商", "sec_prov_sub": "按免费提供的模型排序，长期免费的权重最高",
         "sec_newfree": "新上免费用量", "sec_newfree_sub": "最近 14 天新出现的免费模型或免费额度",
         "sec_newfree_empty": "最近 14 天没有新上的免费用量。",
@@ -93,7 +93,7 @@ T = {
         "limit_unknown": "{period}有上限（按{unit}计，数值见供应商页面）", "reset": "{tz} {t} 重置", "expires": "{n} 天有效", "sep": " · ", "list": "、",
         "more_platforms": "{names} 等 {n} 个供应商", "no_desc": "暂无介绍。", "region": {"cn": "国内", "global": "海外"},
         "to_verify": "待核实", "ended": "已下线", "ended_on": "已于 {d} 下线", "ends_on": "{d} 截止", "ended_alert": "这个免费活动已于 {d} 下线，条目保留供参考。", "one_click": "一键开通", "signup": "注册：", "overage_l": "超额：",
-        "models_count": "模型 {t} 个（免费 {f} · 用免费额度 {q}）", "go_signup": "去注册", "details": "详情", "verified": "最后核实 {d}",
+        "models_count": "模型 {t} 个（可免费用 {f} · 纯收费 {p}）", "go_signup": "去注册", "details": "详情", "verified": "最后核实 {d}",
         "create_key": "创建密钥", "evidence": "官方依据",
         "auto_paid_warn": "注意：这个供应商的免费额度用完后会自动转为付费。请先在供应商控制台开启“用完即停”之类的保护设置。",
         # model square
@@ -173,7 +173,7 @@ T = {
         "home_lead": "Our agents check Chinese and global providers for new free tokens in real time. <b>{m}</b> models you can call for free right now, each quota linked to the provider’s own terms.",
         "sec_hot": "Best free models", "sec_hot_sub": "Lasting free access first, then downloads, provider count and release date",
         "blog_title": "Blog - YangmaoSwitch", "blog_h1": "Blog", "blog_lead": "How the catalog is built, where the data comes from, and desktop app release notes.",
-        "models_short": "{t} ({f} free · {q} on free quota)",
+        "models_short": "{t} ({f} usable for free · {p} paid only)", "new_user": "New users", "refill": {"hour": "hourly", "day": "daily", "week": "weekly", "month": "monthly"}, "over_refill": "{o}; refills {r}", "over_once": "{o}; not refilled",
         "sec_prov": "Recommended providers", "sec_prov_sub": "Ranked by the models they serve for free; lasting free access counts most",
         "sec_newfree": "New free offers", "sec_newfree_sub": "Free models and free quotas that appeared in the last 14 days",
         "sec_newfree_empty": "No new free offers in the last 14 days.",
@@ -212,7 +212,7 @@ T = {
         "limit_unknown": "Limited {period} (in {unit}; see the provider for the number)", "reset": "resets at {t} {tz}", "expires": "valid for {n} days", "sep": " · ", "list": ", ",
         "more_platforms": "{names} and {k} more", "no_desc": "No description yet.", "region": {"cn": "China", "global": "Global"},
         "to_verify": "Unverified", "ended": "Ended", "ended_on": "ended {d}", "ends_on": "ends {d}", "ended_alert": "This free offer ended on {d}. The entry is kept for reference.", "one_click": "One-click", "signup": "Sign-up: ", "overage_l": "When used up: ",
-        "models_count": "{t} models ({f} free · {q} on free quota)", "go_signup": "Sign up", "details": "Details", "verified": "Last verified {d}",
+        "models_count": "{t} models ({f} usable for free · {p} paid only)", "go_signup": "Sign up", "details": "Details", "verified": "Last verified {d}",
         "create_key": "Create a key", "evidence": "Source",
         "auto_paid_warn": "Note: on this provider, usage switches to paid once the free quota is used up. Turn on a stop-when-used-up setting in the provider console first.",
         "sq_title": "YangmaoSwitch - Models you can call for free",
@@ -410,6 +410,25 @@ class Site:
     def ptags(self, p: dict) -> list[str]:
         return (p.get("en") or {}).get("tags", []) if self.L == "en" else p.get("tags", [])
 
+    @staticmethod
+    def is_new_user(q: dict) -> bool:
+        """New-user offers: flagged in the data, or conditions like 'within 14 days of signing up'."""
+        return bool(q.get("new_users")) or bool(re.search(r"注册.{0,8}(天|日|月)内|新用户|新注册|新账号|首次注册|新人", q.get("condition") or ""))
+
+    def overage_text(self, p: dict) -> str:
+        """What happens when the free allowance runs out, and whether it comes back."""
+        t = self.t
+        base = t["overage"][p["overage"]]
+        live = [q for q in p.get("quotas") or [] if not q.get("ended")]
+        lasting = [q["period"] for q in live if q.get("period") in ("hour", "day", "week", "month") and not self.is_new_user(q)]
+        if lasting:
+            order = ["hour", "day", "week", "month"]
+            return t["over_refill"].format(o=base, r=t["refill"][min(lasting, key=order.index)])
+        if live and all(q.get("period") in ("one-time", "second", "minute") or self.is_new_user(q) for q in live) \
+                and any(q.get("period") == "one-time" or self.is_new_user(q) for q in live):
+            return t["over_once"].format(o=base)
+        return base
+
     def quota_text(self, p: dict, i: int) -> str:
         t, q = self.t, p["quotas"][i]
         unit, period = t["unit"].get(q["unit"], q["unit"]), t["period"].get(q["period"], q["period"])
@@ -431,6 +450,8 @@ class Site:
             parts.append(t["expires"].format(n=q["expires_days"]))
         if q.get("ended"):
             parts.append(t["ended_on"].format(d=q["ended"]))
+        if self.is_new_user(q):
+            parts.insert(0, t["new_user"])
         return t["sep"].join(parts)
 
     def price_cell(self, p: dict | None) -> str:
@@ -584,10 +605,10 @@ class Site:
         quotas = "".join(f'<li><a href="{e(q["evidence"])}" rel="nofollow noopener" target="_blank">{e(self.quota_text(p, i))}</a></li>' for i, q in enumerate(p["quotas"]))
         req = t["list"].join(t["requires"].get(r, r) for r in p["signup"].get("requires", [])) or "—"
         over_cls = ' class="danger"' if p["overage"] == "auto_paid" else ""
-        mc = f'<span>{t["models_count"].format(t=pm["total"], f=pm["free"], q=pm["quota"])}</span>' if pm and pm["total"] else ""
+        mc = f'<span>{t["models_count"].format(t=pm["total"], f=pm["free"] + pm["quota"], p=pm["paid"])}</span>' if pm and pm["total"] else ""
         summary = self.ptext(p, "summary")
         search = " ".join([p["name"], p.get("name_zh", ""), summary, " ".join(self.ptags(p))])
-        mc_text = t["models_short"].format(t=pm["total"], f=pm["free"], q=pm["quota"]) if pm and pm["total"] else "—"
+        mc_text = t["models_short"].format(t=pm["total"], f=pm["free"] + pm["quota"], p=pm["paid"]) if pm and pm["total"] else "—"
         quotas = "".join(
             f'<li><a href="{e(q["evidence"])}" rel="nofollow noopener" target="_blank" title="{e(self.quota_text(p, i))}">{e(self.quota_text(p, i))}</a></li>'
             for i, q in enumerate(p["quotas"][:3]))
@@ -597,7 +618,7 @@ class Site:
 <p class="card-sum">{e(summary)}</p>
 <ul class="quotas">{quotas}</ul>
 <dl class="card-facts"><dt>{t['signup'].rstrip('：: ')}</dt><dd title="{e(req)}">{e(req)}</dd>
-<dt>{t['overage_l'].rstrip('：: ')}</dt><dd{over_cls}>{t['overage'][p['overage']]}</dd>
+<dt>{t['overage_l'].rstrip('：: ')}</dt><dd{over_cls}>{e(self.overage_text(p))}</dd>
 <dt>{t['models_h']}</dt><dd>{mc_text}</dd></dl>
 <div class="card-foot"><a class="btn" href="{e(p['signup']['url'])}" rel="nofollow noopener" target="_blank">{t['go_signup']}</a>
 <a class="btn" href="p/{e(p['id'])}.html">{t['details']}</a><span class="foot">{t['verified'].format(d=e(p['last_verified']))}</span></div></article>"""
@@ -614,7 +635,7 @@ class Site:
              (f'<code translate="no">{e(api["base_url"])}</code> ({e(t["k_protocol"].format(p=t["list"].join(t["proto"].get(x, x) for x in api["protocol"])))})' if api else "—")),
             (t["k_requires"], e(t["list"].join(t["requires"].get(r, r) for r in p["signup"].get("requires", [])) or "—")),
             (t["k_blocked"], e(t["list"].join(p["signup"].get("regions_blocked", []))) or "—"),
-            (t["k_overage"], t["overage"][p["overage"]]),
+            (t["k_overage"], e(self.overage_text(p))),
             (t["k_level"], t["level"][p["onboarding"]["level"]]),
             (t["k_verified"], e(p["last_verified"])),
         ]
@@ -728,7 +749,7 @@ class Site:
             p, pm = self.provs[pid], self.pmodels.get(pid) or {}
             q = self.quota_text(p, 0) if p.get("quotas") else ""
             cards.append(f'<a class="pcard" href="p/{e(pid)}.html"><div class="mcard-head">{provider_logo(pid)}<div><b>{e(self.pname(pid))}</b>'
-                         f'<span>{t["models_count"].format(t=pm.get("total", 0), f=pm.get("free", 0), q=pm.get("quota", 0))}</span></div></div>'
+                         f'<span>{t["models_count"].format(t=pm.get("total", 0), f=pm.get("free", 0) + pm.get("quota", 0), p=pm.get("paid", 0))}</span></div></div>'
                          f'<p class="mdesc">{e(q)}</p></a>')
         out.append(section("prov", f'<div class="mgrid one-row">{"".join(cards)}</div>', "providers.html"))
 
