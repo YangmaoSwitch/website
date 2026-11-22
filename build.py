@@ -46,7 +46,7 @@ T = {
         "home_title": "羊毛switch - 免费大模型 API 目录", "home_h1": "免费大模型 API 目录",
         "home_dl_note": "桌面应用目前只有 Windows 版",
         "home_dl": "下载桌面应用",
-        "home_desc": "用 agent 实时检查国内外最新的免费 Token，收录各供应商可以免费调用的大模型，标明免费模型、赠送额度和付费，每条额度链接到供应商原文。配套开源桌面应用在本机管理密钥和用量。",
+        "home_desc": "用 agent 实时检查国内外最新的免费 Token，收录各供应商可以免费调用的大模型，标明免费和付费，每条额度链接到供应商原文。配套开源桌面应用在本机管理密钥和用量。",
         "home_cta": "浏览 {m} 个模型", "home_fresh": "最近一次更新 {d}",
         "home_app": "桌面应用把各供应商的密钥存在系统钥匙串里，给 Cline、Cherry Studio 等工具提供一个本机地址，把请求转给还有额度的账号，用到 90% 就停。",
         "home_submit": "目录尽量保持最新、完整。发现遗漏或错误，欢迎用户和供应商<a href=\"{u}\">提交</a>，我们核实后上架。",
@@ -84,7 +84,7 @@ T = {
                      "github": "GitHub 账号", "google": "Google 账号", "cloud_account": "云账号", "qq": "QQ 号"},
         "overage": {"blocked": "用完即停", "auto_paid": "用完自动转付费", "manual": "需手动开通付费", "unknown": "未知"},
         "level": {"L1": "手动添加密钥", "L2": "粘贴密钥自动识别", "L3": "一键开通"},
-        "access": {"free": "免费模型", "quota": "用免费额度", "paid": "付费"},
+        "access": {"free": "免费", "quota": "免费", "paid": "付费"},
         "group": {"usable": "免费", "free": "免费模型", "quota": "用免费额度", "paid": "付费"},
         "modal": {"text": "文本", "image": "图片", "video": "视频", "audio": "音频", "file": "文件"},
         "tag": {"vision": "视觉", "video": "视频理解", "audio": "音频", "tools": "工具调用", "reasoning": "推理模型", "open": "开源权重"},
@@ -105,7 +105,7 @@ T = {
         "updated": "数据更新于 {d}，尽量保持最新且完整，欢迎用户和供应商<a href=\"{u}\">提交</a>，我们核实后上架。",
         "search_model": "搜索模型名称…", "skip": "跳到正文", "lbl_cap": "能力", "lbl_acc": "调用方式", "lbl_prov": "供应商", "lbl_region": "地区", "lbl_over": "超额处理",
         "ex_h": "同一个模型，{n} 个供应商", "ex_more": "查看全部供应商", "lang_label": "切换到英文", "all": "全部", "cap_vision": "视觉", "cap_tools": "工具调用", "cap_reasoning": "推理",
-        "acc_all": "全部方式", "acc_free": "只看免费模型", "acc_quota": "免费或用免费额度", "all_platforms": "全部供应商", "showing": "显示 {n} 个",
+        "acc_all": "全部方式", "acc_free": "只看免费模型", "acc_quota": "只看免费", "all_platforms": "全部供应商", "showing": "显示 {n} 个",
         # model page
         "m_title": "{name} 在哪些供应商可以免费调用 - 羊毛switch", "m_desc": "{name}：{n} 个供应商的调用方式、免费额度和标价。",
         "ctx": "上下文", "input": "输入", "released": "上线时间", "weights": "开源权重", "ctx_tokens": "{n} Token",
@@ -116,7 +116,7 @@ T = {
         "m_cta": "用 <a href=\"{u}\">羊毛switch 桌面端</a> 添加这些供应商的密钥后，本机入口会按模型名自动选用有额度的账号。",
         # generated description
         "gd_vendor": "{v} 的", "gd_open": "开源", "gd_model": "模型。", "gd_ctx": "上下文 {c}", "gd_input": "可输入{m}", "gd_tools": "支持工具调用",
-        "gd_reason": "支持推理（思考）模式", "gd_avail": "目前可在 {n} 个供应商调用，其中 {k} 个可以免费或用免费额度调用。", "gd_join": "，", "gd_end": "。",
+        "gd_reason": "支持推理（思考）模式", "gd_avail": "目前可在 {n} 个供应商调用，其中 {k} 个可以免费调用。", "gd_join": "，", "gd_end": "。",
         # providers
         "p_title": "供应商 - 羊毛switch", "p_desc": "agent 实时检查的国内外大模型免费 API 额度，每条附官方依据。", "p_h1": "供应商",
         "p_lead": "agent 实时检查国内外供应商的免费额度，每条都附官方依据。",
@@ -150,12 +150,12 @@ T = {
         "j_rows": [("L1 收录", "向目录仓库提交拉取请求，新增一条结构化条目（额度、模型、注册链接、官方依据）", "在官网和桌面端可见；注册链接可带供应商自己的渠道码"),
                    ("L2 半自动", "再提供密钥页链接、密钥前缀、查询剩余额度的接口或响应头", "粘贴密钥即自动识别；本机按真实剩余额度限量"),
                    ("L3 全自动", "再提供 OAuth 2.0 PKCE 公共客户端，允许回调到 127.0.0.1 任意端口，授权后签发密钥", "桌面端一键开通")],
-        "j_models": "也欢迎提供无需密钥即可访问的公开模型列表接口（OpenAI 格式的 <code>/models</code>），并说明每个模型是免费、用免费额度还是付费，方便模型广场保持完整。",
+        "j_models": "也欢迎提供无需密钥即可访问的公开模型列表接口（OpenAI 格式的 <code>/models</code>），并说明每个模型是免费还是付费，方便模型广场保持完整。",
         "j_no": "官方供应商、聚合平台和 API 中转站的免费额度都可以收录。注册链接一律用供应商官方地址，不放返利或邀请链接；需要虚拟号码、批量注册或多开账号才能拿到的额度不收。",
         "j_spec": "查看接入规范", "j_submit": "提交一个供应商", "j_mail": "邮件联系",
         # llms
         "llms_title": "# 羊毛switch", "llms_intro": "开源的大模型密钥与用量管理桌面应用。本站汇总各供应商的免费额度和可以免费调用的模型。",
-        "llms_data": "机器可读数据：catalog.json（供应商与额度）、models.json（各供应商模型列表：免费 / 用免费额度 / 付费，标价）",
+        "llms_data": "机器可读数据：catalog.json（供应商与额度）、models.json（各供应商模型列表：免费 / 付费，标价）",
         "llms_p": "## 供应商", "llms_m": "## 免费模型", "llms_api": "（{x}当 API 用）", "llms_can": "能", "llms_cannot": "不能", "llms_reg": "。注册 {u}",
         "feed_title": "羊毛switch 供应商目录",
     },
@@ -165,7 +165,7 @@ T = {
         "home_title": "YangmaoSwitch - A directory of free LLM APIs", "home_h1": "A directory of free LLM APIs",
         "home_dl_note": "The desktop app is Windows-only for now",
         "home_dl": "Download the desktop app",
-        "home_desc": "Our agents check Chinese and global providers for new free tokens in real time. LLMs you can call for free on each provider, marked as free model, free quota or paid, with every quota linked to the provider’s own terms. The open-source desktop app manages keys and usage locally.",
+        "home_desc": "Our agents check Chinese and global providers for new free tokens in real time. LLMs you can call for free on each provider, marked free or paid, with every quota linked to the provider’s own terms. The open-source desktop app manages keys and usage locally.",
         "home_cta": "Browse {m} models", "home_fresh": "Last updated {d}",
         "home_app": "The desktop app keeps your keys in the system keychain, gives Cline, Cherry Studio and other tools one local address, and sends each request to an account with quota left. It stops at 90% of each free quota.",
         "home_submit": "We aim to keep the catalog current and complete. Users and providers can <a href=\"{u}\">submit</a> missing or wrong entries, and we verify them before listing.",
@@ -203,7 +203,7 @@ T = {
                      "company": "company verification", "github": "GitHub account", "google": "Google account", "cloud_account": "cloud account", "qq": "QQ account"},
         "overage": {"blocked": "Stops when used up", "auto_paid": "Switches to paid when used up", "manual": "Paid use must be enabled manually", "unknown": "Unknown"},
         "level": {"L1": "Add a key manually", "L2": "Paste a key, detected automatically", "L3": "One-click sign-up"},
-        "access": {"free": "Free model", "quota": "Free quota", "paid": "Paid"},
+        "access": {"free": "Free", "quota": "Free", "paid": "Paid"},
         "group": {"usable": "Free", "free": "Free models", "quota": "On free quota", "paid": "Paid"},
         "modal": {"text": "text", "image": "images", "video": "video", "audio": "audio", "file": "files"},
         "tag": {"vision": "Vision", "video": "Video", "audio": "Audio", "tools": "Tools", "reasoning": "Reasoning", "open": "Open weights"},
@@ -223,7 +223,7 @@ T = {
         "updated": "Data updated {d}. We aim to keep it current and complete; users and providers are welcome to <a href=\"{u}\">submit</a> entries, which we verify before listing.",
         "search_model": "Search models…", "skip": "Skip to content", "lbl_cap": "Capability", "lbl_acc": "Access", "lbl_prov": "Provider", "lbl_region": "Region", "lbl_over": "Overage policy",
         "ex_h": "One model, {n} providers", "ex_more": "See all providers", "lang_label": "Switch to Chinese", "all": "All", "cap_vision": "Vision", "cap_tools": "Tools", "cap_reasoning": "Reasoning",
-        "acc_all": "Any access", "acc_free": "Free models only", "acc_quota": "Free or free quota", "all_platforms": "All providers", "showing": "Showing {n}",
+        "acc_all": "Any access", "acc_free": "Free models only", "acc_quota": "Free only", "all_platforms": "All providers", "showing": "Showing {n}",
         "m_title": "Where to call {name} for free - YangmaoSwitch", "m_desc": "{name}: access, free quota and list price on {n} providers.",
         "ctx": "Context", "input": "Input", "released": "Released", "weights": "Weights", "ctx_tokens": "{n} tokens",
         "platforms_h": "Providers serving this model", "th_platform": "Provider", "th_model": "Model ID", "th_access": "Access", "th_quota": "Free quota",
@@ -261,11 +261,11 @@ T = {
         "j_rows": [("L1 Listing", "A pull request to the catalog repository with a structured entry (quota, models, sign-up link, official source)", "Listed on the website and in the app; the sign-up link may carry the provider's own channel code"),
                    ("L2 Assisted", "Also the key page URL, the key prefix, and an endpoint or response headers reporting the remaining quota", "Keys are recognized on paste; usage is capped against the real remaining quota"),
                    ("L3 Automatic", "Also an OAuth 2.0 PKCE public client that allows redirects to any 127.0.0.1 port and issues a key on authorization", "One-click sign-up in the app")],
-        "j_models": "A public model list endpoint that needs no key (OpenAI-style <code>/models</code>), with whether each model is free, on free quota or paid, helps keep the model list complete.",
+        "j_models": "A public model list endpoint that needs no key (OpenAI-style <code>/models</code>), with whether each model is free or paid, helps keep the model list complete.",
         "j_no": "Free quotas from official providers, aggregators and API resellers can all be listed. Sign-up links always point to the provider's official address, never to referral or invite links. Quotas that require virtual phone numbers, bulk sign-ups or multiple accounts are not listed.",
         "j_spec": "Integration guide", "j_submit": "Submit a provider", "j_mail": "Email us",
         "llms_title": "# YangmaoSwitch", "llms_intro": "Open-source desktop app for managing LLM API keys and usage. This site lists free quotas and the models you can call for free.",
-        "llms_data": "Machine-readable data: catalog.json (providers and quotas), models.json (each provider's models: free / free quota / paid, list prices)",
+        "llms_data": "Machine-readable data: catalog.json (providers and quotas), models.json (each provider's models: free / paid, list prices)",
         "llms_p": "## Providers", "llms_m": "## Free models", "llms_api": " ({x} usable as an API)", "llms_can": "", "llms_cannot": "not", "llms_reg": ". Sign up: {u}",
         "feed_title": "YangmaoSwitch providers",
     },
@@ -552,7 +552,7 @@ class Site:
         caps = (["vision"] if "image" in mods else []) + (["tools"] if m.get("tools") else []) + (["reasoning"] if m.get("reasoning") else [])
         title = f"{m['vendor']} / {m['name']}" if m.get("vendor") else m["name"]
         search = " ".join([m["name"], m.get("vendor") or "", m["id"]] + [o["model"] for o in offers])
-        tone = {"free": "ok", "quota": "blue", "paid": ""}[best]
+        tone = {"free": "ok", "quota": "ok", "paid": ""}[best]
         tag_html = f'<span class="mtag {tone}">{t["access"][best]}</span>' + "".join(f'<span class="mtag">{e(x)}</span>' for x in self.tags(m))
         return f"""<a class="mcard" href="m/{e(m['slug'])}.html" data-search="{e(search.lower())}" data-caps="{' '.join(caps)}" data-providers=" {' '.join(o['provider'] for o in offers)} " data-access="{best}" data-heat="{m.get('heat', 0)}" data-created="{e(m.get('created') or '')}" data-n="{len(offers)}">
 <div class="mcard-head">{model_logo(m)}<div><b translate="no">{e(title)}</b><span>{e(plats)}</span></div></div>
@@ -565,7 +565,7 @@ class Site:
         for o in m["offers"]:
             p = self.provs.get(o["provider"])
             q = self.quota_text(p, self.pick_quota(p, o["access"])) if p and p.get("quotas") and o["access"] != "paid" else ""
-            tone = {"free": "ok", "quota": "blue", "paid": ""}[o["access"]]
+            tone = {"free": "ok", "quota": "ok", "paid": ""}[o["access"]]
             rows.append(f"""<tr><td><a class="plat" href="../p/{e(o['provider'])}.html">{provider_logo(o['provider'], 'av sm')}{e(self.pname(o['provider']))}</a></td>
 <td><code translate="no">{e(o['model'])}</code></td><td><span class="mtag {tone}">{t['access'][o['access']]}</span></td><td>{e(q) or '—'}</td><td class="num">{self.price_cell(o.get('price'))}</td></tr>""")
         facts = []
@@ -711,10 +711,10 @@ class Site:
             for c in cols:
                 a = by.get(c)
                 label = f"{m['name']} · {self.pname(c)} · {t['access'][a] if a else t['not_offered']}"
-                cells.append(f'<td><span class="cell {a or "none"}" role="img" aria-label="{e(label)}" title="{e(label)}"></span></td>')
+                cells.append(f'<td><span class="cell {("free" if a == "quota" else a) or "none"}" role="img" aria-label="{e(label)}" title="{e(label)}"></span></td>')
             body.append(f'<tr><th scope="row"><a href="m/{e(m["slug"])}.html" translate="no">{e(m["name"])}</a></th>{"".join(cells)}</tr>')
         legend = "".join(f'<span><i class="cell {k}"></i>{v}</span>' for k, v in
-                         (("free", t["access"]["free"]), ("quota", t["access"]["quota"]), ("paid", t["access"]["paid"]), ("none", t["not_offered"])))
+                         (("free", t["access"]["free"]), ("paid", t["access"]["paid"]), ("none", t["not_offered"])))
         return f"""<figure class="tracker"><figcaption>{t['tracker_cap'].format(n=len(rows))}</figcaption>
 <div class="tracker-scroll"><table><thead><tr><td></td>{head}</tr></thead><tbody>{''.join(body)}</tbody></table></div>
 <div class="legend">{legend}</div></figure>"""
@@ -780,7 +780,7 @@ class Site:
         filters = f"""<div class="toolbar">
 <input id="mq" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="{t['search_model']}" aria-label="{t['search_model'].rstrip('…')}">
 <div class="seg" id="mcap" role="group" aria-label="{t['lbl_cap']}"><button data-v="" aria-pressed="true">{t['all']}</button><button data-v="vision">{t['cap_vision']}</button><button data-v="tools">{t['cap_tools']}</button><button data-v="reasoning">{t['cap_reasoning']}</button></div>
-<select id="macc" name="access" aria-label="{t['lbl_acc']}"><option value="">{t['acc_all']}</option><option value="free">{t['acc_free']}</option><option value="quota">{t['acc_quota']}</option></select>
+<select id="macc" name="access" aria-label="{t['lbl_acc']}"><option value="">{t['acc_all']}</option><option value="quota">{t['acc_quota']}</option></select>
 <select id="mprov" name="platform" aria-label="{t['lbl_prov']}"><option value="">{t['all_platforms']}</option>{''.join(f'<option value="{e(x)}">{e(self.pname(x))}</option>' for x in used)}</select>
 <select id="msort" name="sort" aria-label="{t['sort_lbl']}"><option value="heat">{t['sort_heat']}</option><option value="new">{t['sort_new']}</option><option value="platforms">{t['sort_platforms']}</option></select>
 <span id="mcount" class="muted" aria-live="polite" data-tpl="{e(t['showing'])}"></span></div>"""
