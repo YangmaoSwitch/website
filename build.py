@@ -627,7 +627,8 @@ class Site:
             rows.append((t["k_notes"], e(notes)))
         open_p, close_p = ("（", "）") if self.L == "zh" else (" (", ")")
         quotas = "".join(
-            f'<li>{e(self.quota_text(p, i))}{open_p + e(self.qfield(p, i, "note")) + close_p if self.qfield(p, i, "note") else ""} — <a href="{e(q["evidence"])}" target="_blank" rel="nofollow noopener">{t["evidence"]}</a></li>'
+            f'<li>{e(self.quota_text(p, i))}{open_p + e(self.qfield(p, i, "note")) + close_p if self.qfield(p, i, "note") else ""} — <a href="{e(q["evidence"])}" target="_blank" rel="nofollow noopener">{t["evidence"]}</a>'
+            + (f'<q class="src-quote">{e(q["quote"])}</q>' if q.get("quote") else "") + '</li>'
             for i, q in enumerate(p["quotas"]))
         terms = "".join(f'<li><a href="{e(u)}" target="_blank" rel="nofollow noopener">{e(x)}</a></li>' for x, u in self.terms(p))
         links = [f'<a class="btn primary" href="{e(p["signup"]["url"])}" target="_blank" rel="nofollow noopener">{t["go_signup"]}</a>']

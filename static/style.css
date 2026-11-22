@@ -263,3 +263,4 @@ select { background-color:var(--surface); color:var(--ink); }
 .card-facts dd { margin:0; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .card-foot { display:flex; align-items:center; gap:8px; margin-top:auto; padding-top:4px; }
 .card-foot .foot { margin-left:auto; }
+.src-quote { display:block; margin:.25em 0 .4em; color:var(--muted, #6b6b6b); font-size:.92em; } .src-quote::before { content:"“"; } .src-quote::after { content:"”"; }
