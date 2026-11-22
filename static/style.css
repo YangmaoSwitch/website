@@ -88,7 +88,7 @@ details .list { border:0; border-top:1px solid var(--line); border-radius:0 0 12
 .card-head h3 a { color:var(--ink); }
 .badge { font-size:12px; padding:1px 8px; border-radius:6px; background:var(--rail); }
 .badge.cn { background:#fef2f2; color:#b91c1c; } .badge.global { background:var(--blue-soft); color:var(--blue); }
-.badge.ok { background:var(--ok-soft); color:var(--ok); } .badge.warn { background:#fffbeb; color:var(--warn); }
+.badge.ok { background:var(--ok-soft); color:var(--ok); } .badge.warn { background:#fffbeb; color:var(--warn); } .badge.ended { background:#f1f1f1; color:#6b6b6b; }
 .quotas { margin:0; padding-left:18px; font-size:14px; }
 .quotas a { color:inherit; border-bottom:1px dotted #a1a1aa; }
 .quotas a:hover { text-decoration:none; }

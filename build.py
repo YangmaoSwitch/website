@@ -92,7 +92,7 @@ T = {
         "proto": {"openai": "OpenAI 兼容", "anthropic": "Anthropic", "gemini": "Gemini", "other": "其他"},
         "limit_unknown": "{period}有上限（按{unit}计，数值见供应商页面）", "reset": "{tz} {t} 重置", "expires": "{n} 天有效", "sep": " · ", "list": "、",
         "more_platforms": "{names} 等 {n} 个供应商", "no_desc": "暂无介绍。", "region": {"cn": "国内", "global": "海外"},
-        "to_verify": "待核实", "one_click": "一键开通", "signup": "注册：", "overage_l": "超额：",
+        "to_verify": "待核实", "ended": "已下线", "ended_on": "已于 {d} 下线", "ends_on": "{d} 截止", "ended_alert": "这个免费活动已于 {d} 下线，条目保留供参考。", "one_click": "一键开通", "signup": "注册：", "overage_l": "超额：",
         "models_count": "模型 {t} 个（免费 {f} · 用免费额度 {q}）", "go_signup": "去注册", "details": "详情", "verified": "最后核实 {d}",
         "create_key": "创建密钥", "evidence": "官方依据",
         "auto_paid_warn": "注意：这个供应商的免费额度用完后会自动转为付费。请先在供应商控制台开启“用完即停”之类的保护设置。",
@@ -211,7 +211,7 @@ T = {
         "proto": {"openai": "OpenAI-compatible", "anthropic": "Anthropic", "gemini": "Gemini", "other": "other"},
         "limit_unknown": "Limited {period} (in {unit}; see the provider for the number)", "reset": "resets at {t} {tz}", "expires": "valid for {n} days", "sep": " · ", "list": ", ",
         "more_platforms": "{names} and {k} more", "no_desc": "No description yet.", "region": {"cn": "China", "global": "Global"},
-        "to_verify": "Unverified", "one_click": "One-click", "signup": "Sign-up: ", "overage_l": "When used up: ",
+        "to_verify": "Unverified", "ended": "Ended", "ended_on": "ended {d}", "ends_on": "ends {d}", "ended_alert": "This free offer ended on {d}. The entry is kept for reference.", "one_click": "One-click", "signup": "Sign-up: ", "overage_l": "When used up: ",
         "models_count": "{t} models ({f} free · {q} on free quota)", "go_signup": "Sign up", "details": "Details", "verified": "Last verified {d}",
         "create_key": "Create a key", "evidence": "Source",
         "auto_paid_warn": "Note: on this provider, usage switches to paid once the free quota is used up. Turn on a stop-when-used-up setting in the provider console first.",
@@ -429,6 +429,8 @@ class Site:
             parts.append(t["reset"].format(t=hm, tz=t["tz"].get(tz, tz)))
         if q.get("expires_days"):
             parts.append(t["expires"].format(n=q["expires_days"]))
+        if q.get("ended"):
+            parts.append(t["ended_on"].format(d=q["ended"]))
         return t["sep"].join(parts)
 
     def price_cell(self, p: dict | None) -> str:
@@ -573,7 +575,9 @@ class Site:
         name = self.pname(p["id"])
         tg = [p["region"], "api" if p["api_usable"] else "product", p["onboarding"]["level"], p["overage"]]
         badges = [f'<span class="badge {e(p["region"])}">{t["region"][p["region"]]}</span>']
-        if p["status"] != "verified":
+        if p.get("ended"):
+            badges.append(f'<span class="badge ended" title="{e(t["ended_on"].format(d=p["ended"]))}">{t["ended"]}</span>')
+        elif p["status"] != "verified":
             badges.append(f'<span class="badge warn">{t["to_verify"]}</span>')
         if p["onboarding"]["level"] == "L3":
             badges.append(f'<span class="badge ok">{t["one_click"]}</span>')
@@ -614,6 +618,10 @@ class Site:
             (t["k_level"], t["level"][p["onboarding"]["level"]]),
             (t["k_verified"], e(p["last_verified"])),
         ]
+        if p.get("ended"):
+            rows.append((t["ended"], e(t["ended_on"].format(d=p["ended"]))))
+        elif p.get("ends"):
+            rows.append((t["ends_on"].format(d="").strip(), e(p["ends"])))
         notes = self.ptext(p, "signup_notes")
         if notes:
             rows.append((t["k_notes"], e(notes)))
@@ -626,6 +634,8 @@ class Site:
         if p["onboarding"].get("key_page"):
             links.append(f'<a class="btn" href="{e(p["onboarding"]["key_page"])}" target="_blank" rel="nofollow noopener">{t["create_key"]}</a>')
         warn = f'<p class="alert">{t["auto_paid_warn"]}</p>' if p["overage"] == "auto_paid" else ""
+        if p.get("ended"):
+            warn = f'<p class="alert">{e(t["ended_alert"].format(d=p["ended"]))}</p>' + warn
         models = f'<p class="muted">{t["no_models"].format(u=REPO + "/catalog/issues/new/choose")}</p>'
         if pm and pm["total"]:
             groups = []
