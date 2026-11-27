@@ -133,6 +133,7 @@ T = {
         "d_title": "下载 - 羊毛switch", "d_desc": "下载羊毛switch 桌面端（Windows）", "d_h1": "下载羊毛switch 桌面端",
         "d_lead": "在本机管理各供应商的密钥和用量：查看哪些模型可以免费调用、开通账号、按免费额度记账和限量。",
         "d_release": "最新版本 <b>{t}</b>，发布于 {d}。", "d_win": "下载 Windows 版（{s} MB）",
+        "d_commit": "源码提交",
         "d_note": "目前只提供 Windows 10/11 x64 版本；macOS 和 Linux 版本之后提供。安装包暂未做代码签名，Windows 可能提示“未知发布者”，可在提示里选择“仍要运行”。",
         "d_none": "暂无正式版本。可以从源代码构建。", "d_src": "源代码", "d_issues": "反馈问题",
         "d_sec_h": "安全说明", "d_sec": ["你的密钥只保存在本机系统钥匙串（Windows 凭据管理器）。",
@@ -245,6 +246,7 @@ T = {
         "d_title": "Download - YangmaoSwitch", "d_desc": "Download the YangmaoSwitch desktop app (Windows)", "d_h1": "Download YangmaoSwitch",
         "d_lead": "Manage your API keys and usage on your own computer: find models you can call for free, sign up, and meter and cap usage against each free quota.",
         "d_release": "Latest version <b>{t}</b>, released {d}.", "d_win": "Download for Windows ({s} MB)",
+        "d_commit": "source commit",
         "d_note": "Windows 10/11 x64 only for now; macOS and Linux will follow. The installer is not code-signed yet, so Windows may warn about an unknown publisher; choose “Run anyway”.",
         "d_none": "No release yet. You can build it from source.", "d_src": "Source code", "d_issues": "Report an issue",
         "d_sec_h": "Security", "d_sec": ["Your keys are stored only in the system keychain on your computer (Windows Credential Manager).",
@@ -813,7 +815,9 @@ class Site:
         elif dl_items:
             dl = '<ul class="files">' + "".join(
                 f'<li><a class="btn primary" href="{root}download/{e(f["name"])}">{t["d_win"].format(s=f"{f["size"] / 1048576:.1f}")}</a>'
-                f'<span class="muted small">{e(f["name"])} · SHA-256 <code translate="no">{f["sha"]}</code></span></li>' for f in dl_items) + f'</ul><p class="muted small">{t["d_note"]}</p>'
+                f'<span class="muted small">{e(f["name"])}'
+                + (f' · {t["d_commit"]} <a href="{REPO}/app/commit/{e(f["commit"])}"><code translate="no">{e(f["commit"])}</code></a>' if f.get("commit") else "")
+                + f' · SHA-256 <code translate="no">{f["sha"]}</code></span></li>' for f in dl_items) + f'</ul><p class="muted small">{t["d_note"]}</p>'
         else:
             dl = f'<p class="muted">{t["d_none"]}</p>'
         download = f"""<h1>{t['d_h1']}</h1><p class="lead">{t['d_lead']}</p>{dl}
@@ -913,7 +917,11 @@ def main() -> None:
     dl_items = []
     for f in sorted((ROOT / "static" / "download").glob("*.exe")) if (ROOT / "static" / "download").exists() else []:
         shutil.copy(f, OUT / "download" / f.name)
-        dl_items.append({"name": f.name, "size": f.stat().st_size, "sha": hashlib.sha256(f.read_bytes()).hexdigest()})
+        # <installer>.json next to it records the app commit it was built from (written when the installer is added)
+        side = f.with_name(f.name + ".json")
+        info = json.loads(side.read_text(encoding="utf-8")) if side.exists() else {}
+        dl_items.append({"name": f.name, "size": f.stat().st_size, "sha": hashlib.sha256(f.read_bytes()).hexdigest(),
+                         "commit": info.get("commit")})
     release = latest_release()
 
     for lang in ("zh", "en"):
@@ -925,6 +933,11 @@ def main() -> None:
     (OUT / "sitemap.xml").write_text(f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>', encoding="utf-8")
     (OUT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE}sitemap.xml\n", encoding="utf-8")
     (OUT / ".nojekyll").write_text("", encoding="utf-8")
+    # which catalog data this build used; the scheduled workflow skips a rebuild when the catalog has not changed
+    (OUT / "build-info.json").write_text(json.dumps({
+        "catalog_dist": os.environ.get("YM_CATALOG_DIST_SHA") or None,
+        "catalog_generated_at": cat.get("generated_at"), "models_generated_at": sq.get("generated_at"),
+        "built_at": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()}), encoding="utf-8")
     print(f"ok: {len(models)} models, {len(providers)} providers, zh + en -> {OUT}")
 
 

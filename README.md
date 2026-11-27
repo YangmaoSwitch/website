@@ -31,7 +31,14 @@ draft: true
 
 ## 数据与构建
 
-全部来自 [YangmaoSwitch/catalog](https://github.com/YangmaoSwitch/catalog) 的 `dist` 分支（`catalog.json`、`models.json`），由 `build.py` 静态生成到 `public/`，GitHub Actions 部署到 GitHub Pages（`.github/workflows/pages.yml`：推送到 `main`、每 6 小时定时、catalog 发来 `catalog-updated` 时触发）。GitHub 的定时任务常会延后，目录更新后急需上线时，可以向本仓库推一个空提交触发构建。
+全部来自 [YangmaoSwitch/catalog](https://github.com/YangmaoSwitch/catalog) 的 `dist` 分支（`catalog.json`、`models.json`），由 `build.py` 静态生成到 `public/`，GitHub Actions 部署到 GitHub Pages（`.github/workflows/pages.yml`）：
+
+- 推送到 `main`、手动运行、收到 `catalog-updated` 时都重建。
+- 每小时第 47 分钟检查一次 catalog 的 `dist` 分支：最新提交和线上 `build-info.json` 里记的不同就重建，相同就跳过。catalog 一天更新多次，这样目录变动后约一小时内上线；跨仓库直接触发需要个人令牌，没有采用。
+- 构建按该提交的固定地址读数据，不受分支地址缓存影响。`build-info.json` 记录所用的 `dist` 提交和两份数据的生成时间。
+- GitHub 的定时任务偶尔延后；急需上线时手动运行工作流，或向本仓库推一个空提交。
+
+下载页的安装包放在 `static/download/`；旁边的 `<安装包>.json`（`{"commit": "<app 仓库提交>"}`）记录它由哪个提交构建，下载页显示并链到该提交。
 
 ```bash
 python build.py                                   # 从线上数据构建

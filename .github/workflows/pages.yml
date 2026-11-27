@@ -1,10 +1,13 @@
 name: pages
 
+# The catalog publishes its data to its `dist` branch on every change (the listing agent pushes several times a day).
+# A cross-repo trigger would need a personal token, so instead this checks every hour whether `dist` moved since
+# the deployed build (public/build-info.json) and rebuilds only then. Pushes here and manual runs always rebuild.
 on:
   push:
     branches: [main]
   schedule:
-    - cron: "17 */6 * * *"
+    - cron: "47 * * * *"
   repository_dispatch:
     types: [catalog-updated]
   workflow_dispatch:
@@ -19,7 +22,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.dist.outputs.sha }}
+      build: ${{ steps.dist.outputs.build }}
+    steps:
+      - id: dist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sha=$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/repos/YangmaoSwitch/catalog/commits/dist | jq -r .sha)
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          live=$(curl -fsSL "https://yangmaoswitch.github.io/website/build-info.json?t=$(date +%s)" | jq -r '.catalog_dist // ""' || true)
+          if [ "${{ github.event_name }}" = "schedule" ] && [ -n "$sha" ] && [ "$sha" = "$live" ]; then
+            echo "build=false" >> "$GITHUB_OUTPUT"; echo "catalog dist unchanged ($sha), nothing to rebuild"
+          else
+            echo "build=true" >> "$GITHUB_OUTPUT"; echo "building with catalog dist $sha (live: ${live:-none})"
+          fi
+
   build:
+    needs: check
+    if: needs.check.outputs.build == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -27,7 +51,12 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install markdown==3.7
-      - run: python build.py
+      # read the data at that exact commit: the branch URL can be served from a cache a few minutes old
+      - env:
+          YM_CATALOG_DIST_SHA: ${{ needs.check.outputs.sha }}
+        run: |
+          base=https://raw.githubusercontent.com/YangmaoSwitch/catalog/${YM_CATALOG_DIST_SHA:-dist}
+          python build.py "$base/catalog.json" "$base/models.json"
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
