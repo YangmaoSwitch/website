@@ -11,7 +11,7 @@ The YangmaoSwitch catalog has two layers: provider entries and model lists. Peop
 
 Each provider is one YAML file. It records the unit, period and reset time of every free quota, what sign-up requires, and whether usage stops or switches to paid when the quota runs out. Every quota links to an official source: the provider's docs, pricing page or terms. The entry also records when it was last verified.
 
-This part is not scraped. Quota rules are spread across docs, promotion pages and consoles, each written differently, so we enter them by hand against the original text.
+Quota rules are spread across docs, promotion pages and consoles, each written differently, so they cannot simply be scraped and parsed. A new entry is verified quota by quota on the provider's official pages before it is listed. Listed entries are re-checked by an agent twice a day, provider by provider: are the old quotas still there, and is there a new offer? Every conclusion must quote the official page, and a script confirms the quote really appears on that page.
 
 ## Model lists
 
